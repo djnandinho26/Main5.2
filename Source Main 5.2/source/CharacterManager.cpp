@@ -236,9 +236,9 @@ const char* CCharacterManager::GetCharacterClassText(const BYTE byClass)
 		return GlobalText[1689];
 #ifdef PBG_ADD_NEWCHAR_MONK
 	else if(byCharacterClass == CLASS_RAGEFIGHTER)
-		return GlobalText[3150];	// 3150 "·¹ÀÌÁöÆÄÀÌÅÍ"
+		return GlobalText[3150];	// 3150 "ë ˆì´ì§€íŒŒì´í„°"
 	else if(byCharacterClass == CLASS_TEMPLENIGHT)
-		return GlobalText[3151];	// 3151 "ÅÛÇÃ³ªÀÌÆ®"
+		return GlobalText[3151];	// 3151 "í…œí”Œë‚˜ì´íŠ¸"
 #endif //PBG_ADD_NEWCHAR_MONK
 	return GlobalText[2305];
 }
