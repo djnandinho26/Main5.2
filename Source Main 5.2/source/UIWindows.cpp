@@ -94,9 +94,9 @@ void CUIWindowMgr::Reset()
 DWORD CUIWindowMgr::AddWindow(int iWindowType, int iPos_x, int iPos_y, const char* pszTitle, DWORD dwParentID, int iOption)
 {
 	if (g_iChatInputType == 0/* || g_dwTopWindow != 0*/) return 0;
-	CUIBaseWindow * pbw = NULL;
+	CUIBaseWindow* pbw = NULL;
 
-	switch(iWindowType)
+	switch (iWindowType)
 	{
 	case UIWNDTYPE_EMPTY:
 		pbw = new CUIBaseWindow;
@@ -106,7 +106,7 @@ DWORD CUIWindowMgr::AddWindow(int iWindowType, int iPos_x, int iPos_y, const cha
 		pbw = new CUIChatWindow;
 		if (m_dwMainWindowUIID != 0)
 		{
-			CUIFriendWindow * pMainWnd = (CUIFriendWindow *)GetWindow(m_dwMainWindowUIID);
+			CUIFriendWindow* pMainWnd = (CUIFriendWindow*)GetWindow(m_dwMainWindowUIID);
 			if (pMainWnd != NULL)
 				pMainWnd->AddWindow(pbw->GetUIID(), pszTitle);
 		}
@@ -118,11 +118,11 @@ DWORD CUIWindowMgr::AddWindow(int iWindowType, int iPos_x, int iPos_y, const cha
 			m_dwMainWindowUIID = pbw->GetUIID();
 			if (g_pFriendMenu->IsNewMailAlert() == TRUE)
 			{
-				((CUIFriendWindow *)pbw)->SetTabIndex(1);
+				((CUIFriendWindow*)pbw)->SetTabIndex(1);
 			}
 			else
 			{
-				((CUIFriendWindow *)pbw)->SetTabIndex(m_iLastFriendWindowTabIndex);
+				((CUIFriendWindow*)pbw)->SetTabIndex(m_iLastFriendWindowTabIndex);
 			}
 			g_pFriendMenu->SetNewMailAlert(FALSE);
 			if (IsServerEnable() == FALSE)
@@ -136,20 +136,18 @@ DWORD CUIWindowMgr::AddWindow(int iWindowType, int iPos_x, int iPos_y, const cha
 		if (g_dwTopWindow != 0) return 0;
 		pbw = new CUITextInputWindow;
 		{
-			CUIFriendWindow * pMainWnd = (CUIFriendWindow *)GetWindow(m_dwMainWindowUIID);
+			CUIFriendWindow* pMainWnd = (CUIFriendWindow*)GetWindow(m_dwMainWindowUIID);
 			if (pMainWnd != NULL)
 				pMainWnd->AddWindow(pbw->GetUIID(), pszTitle);
 		}
 		g_dwTopWindow = pbw->GetUIID();
 		break;
 	case UIWNDTYPE_QUESTION:
-		if (g_dwTopWindow != 0) 
-			return 0;
-		break;
+		if (g_dwTopWindow != 0) return 0;
 	case UIWNDTYPE_QUESTION_FORCE:
 		pbw = new CUIQuestionWindow(0);
 		{
-			CUIFriendWindow * pMainWnd = (CUIFriendWindow *)GetWindow(m_dwMainWindowUIID);
+			CUIFriendWindow* pMainWnd = (CUIFriendWindow*)GetWindow(m_dwMainWindowUIID);
 
 			if (pMainWnd != NULL)
 				pMainWnd->AddWindow(pbw->GetUIID(), GlobalText[991]);
@@ -162,7 +160,7 @@ DWORD CUIWindowMgr::AddWindow(int iWindowType, int iPos_x, int iPos_y, const cha
 	case UIWNDTYPE_OK_FORCE:
 		pbw = new CUIQuestionWindow(1);
 		{
-			CUIFriendWindow * pMainWnd = (CUIFriendWindow *)GetWindow(m_dwMainWindowUIID);
+			CUIFriendWindow* pMainWnd = (CUIFriendWindow*)GetWindow(m_dwMainWindowUIID);
 			if (pMainWnd != NULL)
 				pMainWnd->AddWindow(pbw->GetUIID(), GlobalText[228]);
 		}
@@ -173,7 +171,7 @@ DWORD CUIWindowMgr::AddWindow(int iWindowType, int iPos_x, int iPos_y, const cha
 		pbw = new CUILetterReadWindow;
 		if (m_dwMainWindowUIID != 0)
 		{
-			CUIFriendWindow * pMainWnd = (CUIFriendWindow *)GetWindow(m_dwMainWindowUIID);
+			CUIFriendWindow* pMainWnd = (CUIFriendWindow*)GetWindow(m_dwMainWindowUIID);
 			if (pMainWnd != NULL)
 				pMainWnd->AddWindow(pbw->GetUIID(), pszTitle);
 		}
@@ -183,7 +181,7 @@ DWORD CUIWindowMgr::AddWindow(int iWindowType, int iPos_x, int iPos_y, const cha
 		pbw = new CUILetterWriteWindow;
 		if (m_dwMainWindowUIID != 0)
 		{
-			CUIFriendWindow * pMainWnd = (CUIFriendWindow *)GetWindow(m_dwMainWindowUIID);
+			CUIFriendWindow* pMainWnd = (CUIFriendWindow*)GetWindow(m_dwMainWindowUIID);
 			if (pMainWnd != NULL)
 				pMainWnd->AddWindow(pbw->GetUIID(), pszTitle);
 		}
@@ -211,6 +209,7 @@ DWORD CUIWindowMgr::AddWindow(int iWindowType, int iPos_x, int iPos_y, const cha
 					if (iPos_y % 10 == 9)
 					{
 						delete pbw;
+						assert(!"Geunyeoneun jayuroun bangbeob");
 						return 0;
 					}
 					iPos_x = iPos_y = iPos_y % 10 + 1;
@@ -223,14 +222,14 @@ DWORD CUIWindowMgr::AddWindow(int iWindowType, int iPos_x, int iPos_y, const cha
 
 	DWORD dwUIID = pbw->GetUIID();
 
-	m_WindowMap.insert(std::pair<DWORD, CUIBaseWindow *>(dwUIID, pbw));
+	m_WindowMap.insert(std::pair<DWORD, CUIBaseWindow*>(dwUIID, pbw));
 	m_WindowArrangeList.push_back(dwUIID);
 	if (iWindowType == UIWNDTYPE_CHAT || iWindowType == UIWNDTYPE_CHAT_READY) g_pFriendMenu->AddWindow(dwUIID, pbw);
 
 	pbw->Refresh();
 	if (iWindowType == UIWNDTYPE_CHAT)
 	{
-		((CUIChatWindow *)pbw)->FocusReset();
+		((CUIChatWindow*)pbw)->FocusReset();
 	}
 
 	return dwUIID;
@@ -1775,7 +1774,7 @@ void CUIPhotoViewer::RenderPhotoCharacter()
 	glPushMatrix();
 	glLoadIdentity();
 	glViewport2(m_iPos_x * g_fScreenRate_x, m_iPos_y * g_fScreenRate_y, m_iWidth * g_fScreenRate_x, 141 * g_fScreenRate_y);
-	gluPerspective2(1.f,(float)(m_iWidth * g_fScreenRate_x)/(float)(141 * g_fScreenRate_y), 2000, 20000);//CameraViewNear,CameraViewFar);
+	gluPerspective2(1.f,(float)(m_iWidth * g_fScreenRate_x)/(float)(141 * g_fScreenRate_y), CameraViewNear,CameraViewFar); // Test
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
@@ -2446,10 +2445,10 @@ BOOL CUIPhotoViewer::DoMouseAction()
 }
 
 extern int TextNum;
-extern char TextList[30][100];
-extern int  TextListColor[30];
-extern int  TextBold[30];
-extern SIZE Size[30];
+extern char TextList[50][100];
+extern int  TextListColor[50];
+extern int  TextBold[50];
+extern SIZE Size[50];
 
 void CUIPhotoViewer::Render()
 {

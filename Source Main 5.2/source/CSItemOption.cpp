@@ -1,6 +1,7 @@
 /*+++++++++++++++++++++++++++++++++++++
     INCLUDE.
 +++++++++++++++++++++++++++++++++++++*/
+
 #include "stdafx.h"
 #include "ZzzOpenglUtil.h"
 #include "zzzInfomation.h"
@@ -18,9 +19,9 @@
 #include "NewUISystem.h"
 #include "SkillManager.h"
 
-extern	char TextList[30][100];
-extern	int  TextListColor[30];
-extern	int  TextBold[30];
+extern	char TextList[50][100];
+extern	int  TextListColor[50];
+extern	int  TextBold[50];
 extern float g_fScreenRate_x;
 extern float g_fScreenRate_y;
 
@@ -926,7 +927,7 @@ void CSItemOption::getAllAddOptionStatesbyCompare ( WORD* Strength, WORD* Dexter
 
 void CSItemOption::CheckItemSetOptions ( void )
 {
-	BYTE byOptionList[30] = { 0, };
+	BYTE byOptionList[50] = { 0, };
 	ITEM* itemTmp = NULL;
 
     memset ( m_bySetOptionList, 0, sizeof( BYTE ) * 16 );

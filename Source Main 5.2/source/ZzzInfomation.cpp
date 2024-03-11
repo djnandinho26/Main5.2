@@ -1578,25 +1578,25 @@ int ItemValue(ITEM *ip,int goldType)
 
 	ITEM_ATTRIBUTE *p = &ItemAttribute[ip->Type];
 
-	__int64 Gold = 0;
+	DWORD Gold = 0;
 
-	if ( p->iZen!=0 )
-	{
-		Gold = p->iZen;
-		
-		if( goldType )
-		{
-			Gold = Gold/3;
+	if (p->iZen != 0) {
+		__int64 Gold = p->iZen;
+
+		if (goldType) {
+			Gold = Gold / 3;
 		}
 
-		if(Gold >= 1000)
-			Gold = Gold/100*100;
-		else if(Gold >= 100)
-			Gold = Gold/10*10;
+		if (Gold >= 1000) {
+			Gold = Gold / 100 * 100;
+		}
+		else if (Gold >= 100) {
+			Gold = Gold / 10 * 10;
+		}
 
-		return (int)Gold;
+		return static_cast<int>(std::clamp(Gold, static_cast<__int64>(INT_MIN), static_cast<__int64>(INT_MAX)));
 	}
-	
+
 	int Type = ip->Type / MAX_ITEM_INDEX;
 	int Level = (ip->Level>>3)&15;
 	bool Excellent = false;
@@ -2145,11 +2145,11 @@ int ItemValue(ITEM *ip,int goldType)
 			case AT_DAMAGE_REFLECTION:
 			case AT_RECOVER_FULL_LIFE:
 			case AT_RECOVER_FULL_MANA:
-				Gold += ( __int64)( ( double)Gold*25/100);
+				Gold += static_cast<DWORD>(round(static_cast<double>(Gold) * 0.25));
                 break;
 			}
 		}
-		Gold += g_SocketItemMgr.CalcSocketBonusItemValue(ip, Gold);
+		Gold += static_cast<DWORD>(g_SocketItemMgr.CalcSocketBonusItemValue(ip, Gold));
 	}
 	Gold = min(Gold,3000000000);
 
@@ -3247,9 +3247,9 @@ void CHARACTER_MACHINE::CalculateAttackRating()
     if ( gCharacterManager.GetBaseClass( Character.Class )==CLASS_DARK_LORD )
 	    Character.AttackRating  = static_cast<WORD>(((Character.Level*5)+(Dexterity*5)/2)+(Strength/6)+(Charisma/10) & 0xFFFF);
 #ifdef PBG_ADD_NEWCHAR_MONK
-	else if(GetBaseClass( Character.Class )==CLASS_RAGEFIGHTER)
+	else if(gCharacterManager.GetBaseClass( Character.Class )==CLASS_RAGEFIGHTER)
 	{
-		Character.AttackRating = ((Character.Level*3)+(Dexterity*5)/4)+(Strength/6);
+		Character.AttackRating = ((Character.Level*3)+(Dexterity*5)/4)+(Strength/6) & 0xFFFF;
 	}
 #endif //PBG_ADD_NEWCHAR_MONK
     else
@@ -3908,7 +3908,10 @@ void CHARACTER_MACHINE::CalculateBasicState()
 	if(g_isCharacterBuff((&Hero->Object), eBuff_Hp_up_Ourforces))
 	{
 #ifdef PBG_MOD_RAGEFIGHTERSOUND
-		WORD _AddStat = (WORD)(30+(WORD)((Character.Energy-132)/10));
+		WORD _AddStat = 0;
+		if (Character.Energy >= 132) {
+			_AddStat= (WORD)(30 + (WORD)((Character.Energy - 132) / 10));
+		}
 #else //PBG_MOD_RAGEFIGHTERSOUND
 		WORD _AddStat = (WORD)(30+(WORD)((Character.Energy-380)/10));
 #endif //PBG_MOD_RAGEFIGHTERSOUND

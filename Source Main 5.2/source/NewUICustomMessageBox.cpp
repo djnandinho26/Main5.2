@@ -5116,7 +5116,7 @@ bool SEASON3B::CStorageLockMsgBoxLayout::SetLayout()
 
 	pMsgBox->SetInputBoxOption(UIOPTION_PAINTBACK);
 	pMsgBox->AddMsg(GlobalText[691]);
-	pMsgBox->AddMsg(GlobalText[697]);
+	//pMsgBox->AddMsg(GlobalText[697]); //Duplicate
 	pMsgBox->AddCallbackFunc(SEASON3B::CStorageLockMsgBoxLayout::ReturnDown, MSGBOX_EVENT_PRESSKEY_RETURN);
 	pMsgBox->AddCallbackFunc(SEASON3B::CStorageLockMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
 	pMsgBox->AddCallbackFunc(SEASON3B::CStorageLockMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);

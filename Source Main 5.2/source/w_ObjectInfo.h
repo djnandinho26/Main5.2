@@ -12,48 +12,41 @@ public:
 	{
 		float	fRateStart;
 		float	fRateEnd;
-		
+
 		vec3_t	v3Start;
 		vec3_t	v3End;
-		INTERPOLATE_FACTOR( float fRateStart_, float fRateEnd_,
-			vec3_t& v3Start_, vec3_t& v3End_ )
+		INTERPOLATE_FACTOR(float fRateStart_, float fRateEnd_,
+			vec3_t& v3Start_, vec3_t& v3End_)
 		{
 			fRateStart = fRateStart_;
 			fRateEnd = fRateEnd_;
-			
+
 			VectorCopy(v3Start_, v3Start);
 			VectorCopy(v3End_, v3End);
 		};
-		
 		INTERPOLATE_FACTOR()
-		{
-			
-		};
+		{};
 	};
-	
+
 	struct INTERPOLATE_FACTOR_F
 	{
 		float	fRateStart;
 		float	fRateEnd;
-		
+
 		float	fStart;
 		float	fEnd;
-		INTERPOLATE_FACTOR_F( float fRateStart_, float fRateEnd_,
-			float& fStart_, float& fEnd_ )
+		INTERPOLATE_FACTOR_F(float fRateStart_, float fRateEnd_,
+			float& fStart_, float& fEnd_)
 		{
 			fRateStart = fRateStart_;
 			fRateEnd = fRateEnd_;
-			
+
 			fStart = fStart_;
 			fEnd = fEnd_;
 		};
-		
 		INTERPOLATE_FACTOR_F()
-		{
-			
-		};
+		{};
 	};
-	
 
 public:
 	typedef std::vector<INTERPOLATE_FACTOR>		VEC_INTERPOLATES;
@@ -61,35 +54,35 @@ public:
 	VEC_INTERPOLATES						m_vecInterpolatesAngle;
 	VEC_INTERPOLATES						m_vecInterpolatesPos;
 	VEC_INTERPOLATES_F						m_vecInterpolatesScale;
-	VEC_INTERPOLATES_F						m_vecInterpolatesAlpha;	
-		
-	public:
-		void GetCurrentValue(vec3_t& v3Out, float fCurrentRate, VEC_INTERPOLATES& vecInterpolates );
-		void GetAngleCurrent(vec3_t& v3Out, float fCurrentRate )
-		{
-			GetCurrentValue( v3Out, fCurrentRate, m_vecInterpolatesAngle );
-		}
-		void GetPosCurrent(vec3_t& v3Out, float fCurrentRate )
-		{
-			GetCurrentValue( v3Out, fCurrentRate, m_vecInterpolatesPos );
-		}
+	VEC_INTERPOLATES_F						m_vecInterpolatesAlpha;
 
-		void GetCurrentValueF(float& fOut, float fCurrentRate, VEC_INTERPOLATES_F& vecInterpolates );
-		void GetScaleCurrent(float& fOut, float fCurrentRate )
-		{
-			GetCurrentValueF( fOut, fCurrentRate, m_vecInterpolatesScale );
-		}
+public:
+	void GetCurrentValue(vec3_t& v3Out, float fCurrentRate, VEC_INTERPOLATES& vecInterpolates);
+	void GetAngleCurrent(vec3_t& v3Out, float fCurrentRate)
+	{
+		GetCurrentValue(v3Out, fCurrentRate, m_vecInterpolatesAngle);
+	}
+	void GetPosCurrent(vec3_t& v3Out, float fCurrentRate)
+	{
+		GetCurrentValue(v3Out, fCurrentRate, m_vecInterpolatesPos);
+	}
 
-		void GetAlphaCurrent(float& fOut, float fCurrentRate )
-		{
-			GetCurrentValueF( fOut, fCurrentRate, m_vecInterpolatesAlpha );
-		}
-		
-	public:
-		void ClearContainer();
-		
-		CInterpolateContainer(){};
-		~CInterpolateContainer(){};
+	void GetCurrentValueF(float& fOut, float fCurrentRate, VEC_INTERPOLATES_F& vecInterpolates);
+	void GetScaleCurrent(float& fOut, float fCurrentRate)
+	{
+		GetCurrentValueF(fOut, fCurrentRate, m_vecInterpolatesScale);
+	}
+
+	void GetAlphaCurrent(float& fOut, float fCurrentRate)
+	{
+		GetCurrentValueF(fOut, fCurrentRate, m_vecInterpolatesAlpha);
+	}
+
+public:
+	void ClearContainer();
+
+	CInterpolateContainer() {};
+	~CInterpolateContainer() {};
 };
 
 typedef struct tagMU_POINTF
@@ -103,7 +96,7 @@ typedef struct tagSIZEF
 	float cx;
 	float cy;
 } SIZEF;
-	
+
 typedef struct
 {
 	vec3_t StartPos;
@@ -151,16 +144,16 @@ public:
 	BYTE          ExtState;
 	BYTE          Teleport;
 	BYTE          Kind;
-	WORD		Skill;
+	WORD		  Skill;
 	BYTE		  m_byNumCloth;
 	BYTE		  m_byHurtByOneToOne;
 	BYTE          WeaponLevel;
 	BYTE          DamageTime;
 	BYTE          m_byBuildTime;
 	BYTE		  m_bySkillCount;
-	BYTE		m_bySkillSerialNum;
+	BYTE		  m_bySkillSerialNum;
 	BYTE		  Block;
-	void*		  m_pCloth;
+	void* m_pCloth;
 
 public:
 	short         ScreenX;
@@ -181,8 +174,8 @@ public:
 	int           LinkBone;
 
 public:
-	DWORD			m_dwTime;
-	
+	DWORD		  m_dwTime;
+
 public:
 	float         Scale;
 	float         BlendMeshLight;
@@ -199,14 +192,14 @@ public:
 	float         PriorAnimationFrame;
 	float	      AlphaTarget;
 	float         Alpha;
-	
+
 public:
 	vec3_t        Light;
 	vec3_t        Direction;
 	vec3_t		  m_vPosSword;
 	vec3_t		  StartPosition;
 	vec3_t        BoundingBoxMin;
-	vec3_t        BoundingBoxMax;	
+	vec3_t        BoundingBoxMax;
 	vec3_t		  m_vDownAngle;
 	vec3_t		  m_vDeadPosition;
 	vec3_t        Position;
@@ -221,21 +214,21 @@ public:
 	vec3_t		  EyeRight3;
 public:
 	vec34_t	 	  Matrix;
-	vec34_t       *BoneTransform;
+	vec34_t* BoneTransform;
 
 public:
 	OBB_t		  OBB;
-	
+
 public:
-	OBJECT        *Owner;
-	OBJECT		  *Prior;
-	OBJECT		  *Next;
+	OBJECT* Owner;
+	OBJECT* Prior;
+	OBJECT* Next;
 
 public:
 	Buff		  m_BuffMap;
 
 public:
-	short int		m_sTargetIndex;
+	short int	  m_sTargetIndex;
 
 public:
 	BOOL		m_bpcroom;
@@ -244,4 +237,3 @@ public:
 
 	CInterpolateContainer	m_Interpolates;
 };
-

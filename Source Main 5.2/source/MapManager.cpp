@@ -92,21 +92,22 @@ void CMapManager::Load() // OK
 		}
 		break;
 	case WD_3NORIA:
-		gLoadData.AccessModel(MODEL_BUTTERFLY01	 ,"Data\\Object1\\","Butterfly",1);
-		gLoadData.OpenTexture(MODEL_BUTTERFLY01	 ,"Object1\\");
-		gLoadData.AccessModel(MODEL_WARP	 ,"Data\\Npc\\","warp01");
-		gLoadData.AccessModel(MODEL_WARP2	 ,"Data\\Npc\\","warp02");
-		gLoadData.AccessModel(MODEL_WARP3	 ,"Data\\Npc\\","warp03");
-		
-		gLoadData.OpenTexture(MODEL_WARP	 ,"Npc\\");
-		gLoadData.OpenTexture(MODEL_WARP2	 ,"Npc\\");
-		gLoadData.OpenTexture(MODEL_WARP3	 ,"Npc\\");
-		
+		gLoadData.AccessModel(MODEL_BUTTERFLY01, "Data\\Object1\\", "Butterfly", 1);
+		gLoadData.OpenTexture(MODEL_BUTTERFLY01, "Object1\\");
+		gLoadData.AccessModel(MODEL_WARP, "Data\\Npc\\", "warp01");
+		gLoadData.AccessModel(MODEL_WARP2, "Data\\Npc\\", "warp02");
+		gLoadData.AccessModel(MODEL_WARP3, "Data\\Npc\\", "warp03");
+
+		gLoadData.OpenTexture(MODEL_WARP, "Npc\\");
+		gLoadData.OpenTexture(MODEL_WARP2, "Npc\\");
+		gLoadData.OpenTexture(MODEL_WARP3, "Npc\\");
+
 		vec3_t Pos, Ang;
-		Vector ( 0.f, 0.f, 10.f, Ang );
-		Vector ( 0.f, 0.f, 0.f, Pos );
-		Pos[0] = 223*TERRAIN_SCALE; Pos[1] = 30*TERRAIN_SCALE;
-		CreateObject ( MODEL_WARP, Pos, Ang );
+		Vector(0.f, 0.f, 10.f, Ang);
+		Vector(0.f, 0.f, 0.f, Pos);
+		Pos[0] = 223 * TERRAIN_SCALE;
+		Pos[1] = 30 * TERRAIN_SCALE;
+		CreateObject(MODEL_WARP, Pos, Ang);
 		break;
 	case WD_5UNKNOWN:
 		for(int i=0;i<5;i++)
@@ -1673,18 +1674,14 @@ bool CMapManager::InDevilSquare()
 	return WD_9DEVILSQUARE == this->WorldActive ? true : false;
 }
 
-bool CMapManager::InHellas(int iMap) 
-{ 
-	if (iMap == -1) return false;
-
-	return ((this->WorldActive>=WD_24HELLAS && this->WorldActive<=WD_24HELLAS_END) || (this->WorldActive==WD_24HELLAS_7)); 
+bool CMapManager::InHellas(int iMap)
+{
+	return ((this->WorldActive >= WD_24HELLAS && this->WorldActive <= WD_24HELLAS_END) || (this->WorldActive == WD_24HELLAS_7));
 }
 
-bool CMapManager::InHiddenHellas(int iMap) 
-{ 
-	if (iMap == -1) return false;
-
-	return (this->WorldActive==WD_24HELLAS_7) ? true : false; 
+bool CMapManager::InHiddenHellas(int iMap)
+{
+	return (this->WorldActive == WD_24HELLAS_7) ? true : false;
 }
 
 bool CMapManager::IsPKField()
@@ -1736,11 +1733,8 @@ bool CMapManager::IsEmpireGuardian()
 
 bool CMapManager::InBattleCastle (int iMap) 
 { 
-	if (iMap == -1) return false;
-
-	return (this->WorldActive==WD_30BATTLECASTLE) ? true : false;
+	return (this->WorldActive == WD_30BATTLECASTLE) ? true : false;
 }
-
 
 const char* CMapManager::GetMapName( int iMap)
 {

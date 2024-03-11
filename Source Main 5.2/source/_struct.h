@@ -148,13 +148,13 @@ typedef struct
 typedef struct
 {
 	char Name[30];
-	WORD TwoHand;
+	bool TwoHand;
 	WORD Level;
-	WORD m_byItemSlot;
+	BYTE m_byItemSlot;
 #ifdef PBG_ADD_NEWCHAR_MONK_SKILL
 	WORD m_wSkillIndex;
 #else //PBG_ADD_NEWCHAR_MONK_SKILL
-	WORD m_bySkillIndex;
+	BYTE m_bySkillIndex;
 #endif //PBG_ADD_NEWCHAR_MONK_SKILL
 	BYTE Width;
 	BYTE Height;
@@ -171,14 +171,14 @@ typedef struct
 	WORD RequireStrength;
 	WORD RequireDexterity;
 	WORD RequireEnergy;
-	WORD  RequireVitality;
+	WORD RequireVitality;
 	WORD RequireCharisma;
 	WORD RequireLevel;
-	WORD Value;
-	int  iZen;
-	BYTE  AttType;
-	BYTE RequireClass[MAX_CLASS+1];
-	BYTE Resistance[MAX_RESISTANCE+1];
+	BYTE Value;
+	int iZen;
+	BYTE AttType;
+	BYTE RequireClass[MAX_CLASS];
+	BYTE Resistance[MAX_RESISTANCE];
 } ITEM_ATTRIBUTE;
 
 typedef struct _MASTER_LEVEL_DATA
@@ -298,6 +298,34 @@ typedef struct
 	MONSTER_ATTRIBUTE Attribute;
 } MONSTER;
 
+#ifdef ELF_CHEAT_TEST_SKILL_SS6
+typedef struct
+{
+	/*+00*/	char Name[32];
+	/*+32*/	WORD Level;
+	/*+34*/	WORD Damage;
+	/*+36*/	WORD Mana;
+	/*+38*/	WORD AbilityGuage;
+	/*+40*/	DWORD Distance;
+	/*+44*/	int Delay;
+	/*+48*/	int Energy;
+	/*+52*/	WORD Charisma;
+	/*+54*/	BYTE MasteryType;
+	/*+55*/	BYTE SkillUseType;
+	/*+56*/	DWORD SkillBrand;
+	/*+60*/	BYTE KillCount;
+	/*+61*/	BYTE RequireDutyClass[MAX_DUTY_CLASS];
+	/*+64*/	BYTE RequireClass[MAX_CLASS];
+	/*+71*/	BYTE SkillRank;
+	/*+72*/	WORD Magic_Icon;
+	/*+74*/	BYTE TypeSkill;
+	/*+76*/	int Strength;
+	/*+80*/	int Dexterity;
+	/*+84*/	BYTE ItemSkill;
+	/*+85*/	BYTE IsDamage;
+	/*+86*/	WORD Effect;
+} SKILL_ATTRIBUTE;
+#else 
 typedef struct
 {
 	char Name[32];
@@ -309,7 +337,7 @@ typedef struct
 	int  Delay;
 
 	int Energy;
-	
+
 	WORD Charisma;
 	BYTE MasteryType;
 	BYTE SkillUseType;
@@ -318,14 +346,14 @@ typedef struct
 	BYTE RequireDutyClass[MAX_DUTY_CLASS];
 	BYTE RequireClass[MAX_CLASS];
 	WORD Magic_Icon;
-	
+
 	BYTE TypeSkill;
 
 	int Strength;
 	int Dexterity;
 
 } SKILL_ATTRIBUTE;
-
+#endif
 
 typedef struct
 {

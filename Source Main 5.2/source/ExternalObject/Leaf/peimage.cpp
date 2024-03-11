@@ -730,6 +730,7 @@ bool CPeImageDataInjector::WriteDosHeader(xstreambuf& xNewImage, const void* pOr
 
 	return true;
 }
+
 bool CPeImageDataInjector::WriteNtHeaders(xstreambuf& xNewImage, const void* pOrigImage, const PPE_INJECTION_PACK_HEADER pIPH, OUT PIMAGE_NT_HEADERS pNewNtHeaders)
 {
 	//. acquire nt header
@@ -742,7 +743,9 @@ bool CPeImageDataInjector::WriteNtHeaders(xstreambuf& xNewImage, const void* pOr
 	NewNtHeaders.OptionalHeader.FileAlignment = pIPH->wFileAlignment;
 	NewNtHeaders.OptionalHeader.SizeOfHeaders = pIPH->wSizeOfHeaders;
 	NewNtHeaders.OptionalHeader.BaseOfCode = pIPH->dwBaseOfCode;
+#ifndef _WIN64
 	NewNtHeaders.OptionalHeader.BaseOfData = pIPH->dwBaseOfCode + pOrigNtHeaders->OptionalHeader.SizeOfCode + pIPH->dwSizeOfIPD;
+#endif // _WIN64
 	xNewImage.write(&NewNtHeaders, sizeof(IMAGE_NT_HEADERS));
 
 	//. acquire nt header
@@ -751,6 +754,7 @@ bool CPeImageDataInjector::WriteNtHeaders(xstreambuf& xNewImage, const void* pOr
 
 	return true;	
 }
+
 bool CPeImageDataInjector::WriteSectionHeader(xstreambuf& xNewImage, const void* pOrigImage, const PPE_INJECTION_PACK_HEADER pIPH)
 {
 	//. acquire nt header

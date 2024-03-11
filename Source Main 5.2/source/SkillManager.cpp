@@ -8,6 +8,7 @@
 #include "ZzzCharacter.h"
 
 CSkillManager gSkillManager;
+extern bool CheckAttack();
 
 CSkillManager::CSkillManager() // OK
 {

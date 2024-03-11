@@ -178,10 +178,10 @@ int getLevelGeneration ( int level, unsigned int* color )
     return lvl;
 }
 
-char TextList[30][100];
-int  TextListColor[30];
-int  TextBold[30];
-SIZE Size[30];
+char TextList[50][100];
+int  TextListColor[50];
+int  TextBold[50];
+SIZE Size[50];
 
 int RenderTextList(int sx,int sy,int TextNum,int Tab, int iSort = RT3_SORT_CENTER)
 {
@@ -2039,11 +2039,11 @@ void GetSpecialOptionText ( int Type, char* Text, BYTE Option, BYTE Value, int i
 		break;
 #ifdef PBG_ADD_NEWCHAR_MONK_SKILL
 	case AT_SKILL_THRUST:
-		GetSkillInformation( Option, 1, NULL, &iMana, NULL);
+		gSkillManager.GetSkillInformation( Option, 1, NULL, &iMana, NULL);
         sprintf(Text,GlobalText[3153], iMana);
 		break;
 	case AT_SKILL_STAMP:
-		GetSkillInformation( Option, 1, NULL, &iMana, NULL);
+		gSkillManager.GetSkillInformation( Option, 1, NULL, &iMana, NULL);
         sprintf(Text,GlobalText[3154], iMana);
 		break;
 #endif //PBG_ADD_NEWCHAR_MONK_SKILL
@@ -4461,7 +4461,7 @@ void RenderItemInfo(int sx,int sy,ITEM *ip,bool Sell, int Inventype, bool bItemT
         int startIndex = 0;
         if ( gCharacterManager.GetBaseClass( Hero->Class )==CLASS_DARK || gCharacterManager.GetBaseClass( Hero->Class )==CLASS_DARK_LORD 
 #ifdef PBG_ADD_NEWCHAR_MONK
-			|| GetBaseClass( Hero->Class )==CLASS_RAGEFIGHTER
+			|| gCharacterManager.GetBaseClass( Hero->Class )==CLASS_RAGEFIGHTER
 #endif //PBG_ADD_NEWCHAR_MONK
 			)
 		{
@@ -6015,7 +6015,7 @@ bool GetAttackDamage ( int* iMinDamage, int* iMaxDamage )
         }
     }
 #ifdef PBG_ADD_NEWCHAR_MONK
-	else if(GetBaseClass(Hero->Class) == CLASS_RAGEFIGHTER)
+	else if(gCharacterManager.GetBaseClass(Hero->Class) == CLASS_RAGEFIGHTER)
 	{
 		if(l->Type>=ITEM_SWORD && l->Type<ITEM_MACE+MAX_ITEM_INDEX && r->Type>=ITEM_SWORD && r->Type<ITEM_MACE+MAX_ITEM_INDEX)
 		{
@@ -7480,6 +7480,7 @@ int GetScreenWidth()
 		|| g_pNewUISystem->IsVisible(SEASON3B::INTERFACE_DOPPELGANGER_NPC)
 		|| g_pNewUISystem->IsVisible(SEASON3B::INTERFACE_UNITEDMARKETPLACE_NPC_JULIA)
 		|| g_pNewUISystem->IsVisible(SEASON3B::INTERFACE_GENSRANKING)
+		|| g_pNewUISystem->IsVisible(SEASON3B::INTERFACE_MUHELPER)
 		) 
 	{
         iWidth = 640 - 190;
@@ -9602,6 +9603,12 @@ void RenderObjectScreen(int Type,int ItemLevel,int Option1,int ExtOption,vec3_t 
 		Position[1] += 0.08f;
 		Vector(0.f,0.f,0.f,ObjectSelect.Angle);
 	}
+	else if (Type == MODEL_ARMORINVEN_74)
+	{
+		Position[0] += 0.01f;
+		Position[1] += 0.05f;
+		Vector(90.f, 0.f, 0.f, ObjectSelect.Angle);
+	}
 	else if(Type == MODEL_SWORD+32)
 	{
 		Position[0] += 0.005f;
@@ -9612,6 +9619,12 @@ void RenderObjectScreen(int Type,int ItemLevel,int Option1,int ExtOption,vec3_t 
 	{
 		Position[0] += 0.002f;
 		Position[1] += 0.02f;
+		Vector(0.f,0.f,0.f,ObjectSelect.Angle);
+	}
+	else if (Type == MODEL_SWORD+35)
+	{
+		Position[0] -= 0.005f;
+		Position[1] += 0.015f;
 		Vector(0.f,0.f,0.f,ObjectSelect.Angle);
 	}
 	else if(Type==MODEL_WING+49)
@@ -9758,6 +9771,7 @@ void RenderObjectScreen(int Type,int ItemLevel,int Option1,int ExtOption,vec3_t 
 		|| ObjectSelect.Type == MODEL_ARMORINVEN_60
 		|| ObjectSelect.Type == MODEL_ARMORINVEN_61
 		|| ObjectSelect.Type == MODEL_ARMORINVEN_62
+		|| ObjectSelect.Type == MODEL_ARMORINVEN_74
 #endif //PBG_ADD_NEWCHAR_MONK_ITEM
 		)
 		ObjectSelect.Type = MODEL_PLAYER;
@@ -10549,11 +10563,15 @@ void RenderObjectScreen(int Type,int ItemLevel,int Option1,int ExtOption,vec3_t 
 		{
 			Scale = 0.0035f;
 		}
+		else if (Type == MODEL_SWORD+35)
+		{
+			Scale = 0.003f;
+		}
 		else if(Type >= MODEL_ETC+30 && Type <= MODEL_ETC+36)
 		{
 			Scale = 0.0023f;
 		}
-		else if(Type == MODEL_ARMORINVEN_60 || Type == MODEL_ARMORINVEN_62 || Type == MODEL_ARMORINVEN_61)
+		else if(Type == MODEL_ARMORINVEN_60 || Type == MODEL_ARMORINVEN_62 || Type == MODEL_ARMORINVEN_61 || Type == MODEL_ARMORINVEN_74)
 		{
 			b->BodyHeight = -100.f;
 			Scale = 0.0039f;
@@ -10964,7 +10982,7 @@ void RenderItem3D(float sx,float sy,float Width,float Height,int Type,int Level,
 	}
 
 #ifdef PBG_ADD_NEWCHAR_MONK_ITEM
-	if(Type>=ITEM_SWORD+32 && Type<=ITEM_SWORD+34)
+	if(Type>=ITEM_SWORD+32 && Type<=ITEM_SWORD+35)
 	{
 		sx -= Width*0.25f;
 		sy -= Height*0.25f;
@@ -11168,6 +11186,10 @@ void RenderItem3D(float sx,float sy,float Width,float Height,int Type,int Level,
 	{
 		RenderObjectScreen(MODEL_ARMORINVEN_62,Level,Option1,ExtOption,Position,Success,PickUp);
 	}
+	else if(Type == ITEM_ARMOR+73)
+	{
+		RenderObjectScreen(MODEL_ARMORINVEN_74,Level,Option1,ExtOption,Position,Success,PickUp);
+	}
 #endif //PBG_ADD_NEWCHAR_MONK_ITEM
 	else
 	{
@@ -11256,7 +11278,7 @@ void RenderEqiupmentBox()
     RenderBitmap(BITMAP_INVENTORY+16,x+StartX,y+StartY,Width,Height,0.f,0.f,Width/64.f,Height/64.f);
     //glove
 #ifdef PBG_ADD_NEWCHAR_MONK
-	if(GetBaseClass(CharacterAttribute->Class)!=CLASS_RAGEFIGHTER)
+	if(gCharacterManager.GetBaseClass(CharacterAttribute->Class)!=CLASS_RAGEFIGHTER)
 	{
 #endif //PBG_ADD_NEWCHAR_MONK
 	Width=40.f;Height=40.f;x=15.f;y=152.f;

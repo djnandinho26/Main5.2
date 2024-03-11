@@ -39,52 +39,60 @@ CCreditWin::~CCreditWin()
 
 void CCreditWin::Create()
 {
-	CInput rInput = CInput::Instance();
+	// Get the instance of CInput
+	CInput& rInput = CInput::Instance();
 
+	// Create the window with the dimensions obtained from CInput
 	CWin::Create(rInput.GetScreenWidth(), rInput.GetScreenHeight());
 	CWin::SetBgAlpha(255);
 
+	// Calculate scaling factors for images and text
 	float fScaleX = (float)rInput.GetScreenWidth() / 800.0f;
 	float fScaleY = (float)rInput.GetScreenHeight() / 600.0f;
 
-	m_aSpr[CRW_SPR_DECO].Create(189, 103, BITMAP_LOG_IN+6);
-	m_aSpr[CRW_SPR_LOGO].Create(290, 41, BITMAP_LOG_IN+14, 0, NULL, 0, 0,
-		false, SPR_SIZING_DATUMS_LT, fScaleX, fScaleY);
+	// Create sprite for decorative image and logo image
+	m_aSpr[CRW_SPR_DECO].Create(189, 103, BITMAP_LOG_IN + 6);
+	m_aSpr[CRW_SPR_LOGO].Create(290, 41, BITMAP_LOG_IN + 14, 0, NULL, 0, 0, false, SPR_SIZING_DATUMS_LT, fScaleX, fScaleY);
 
+	// Create sprites for text
 	for (int i = CRW_SPR_TXT_HIDE0; i <= CRW_SPR_TXT_HIDE2; ++i)
 	{
-		m_aSpr[i].Create(800, 42, -1, 0, NULL, 0, 0, false,
-			SPR_SIZING_DATUMS_LT, fScaleX, fScaleY);
+		m_aSpr[i].Create(800, 42, -1, 0, NULL, 0, 0, false, SPR_SIZING_DATUMS_LT, fScaleX, fScaleY);
 		m_aSpr[i].SetColor(0, 0, 0);
 	}
 
-	m_btnClose.Create(54, 30, BITMAP_BUTTON+2, 3, 2, 1);
+	// Create close button and register it with the window
+	m_btnClose.Create(54, 30, BITMAP_BUTTON + 2, 3, 2, 1);
 	CWin::RegisterButton(&m_btnClose);
 
+	// Set the illustration state to HIDE and specify paths for illustration images
 	m_eIllustState = HIDE;
-	m_apszIllustPath[0][0] = (char*)"Interface\\im1_1.jpg";
-	m_apszIllustPath[0][1] = (char*)"Interface\\im1_2.jpg";
-	m_apszIllustPath[1][0] = (char*)"Interface\\im2_1.jpg";
-	m_apszIllustPath[1][1] = (char*)"Interface\\im2_2.jpg";
-	m_apszIllustPath[2][0] = (char*)"Interface\\im3_1.jpg";
-	m_apszIllustPath[2][1] = (char*)"Interface\\im3_2.jpg";
-	m_apszIllustPath[3][0] = (char*)"Interface\\im4_1.jpg";
-	m_apszIllustPath[3][1] = (char*)"Interface\\im4_2.jpg";
-	m_apszIllustPath[4][0] = (char*)"Interface\\im5_1.jpg";
-	m_apszIllustPath[4][1] = (char*)"Interface\\im5_2.jpg";
-	m_apszIllustPath[5][0] = (char*)"Interface\\im6_1.jpg";
-	m_apszIllustPath[5][1] = (char*)"Interface\\im6_2.jpg";
-	m_apszIllustPath[6][0] = (char*)"Interface\\im7_1.jpg";
-	m_apszIllustPath[6][1] = (char*)"Interface\\im7_2.jpg";
-	m_apszIllustPath[7][0] = (char*)"Interface\\im8_1.jpg";
-	m_apszIllustPath[7][1] = (char*)"Interface\\im8_2.jpg";
+	char* apszIllustPath[8][2] = {
+		{"Interface\\im1_1.jpg", "Interface\\im1_2.jpg"},
+		{"Interface\\im2_1.jpg", "Interface\\im2_2.jpg"},
+		{"Interface\\im3_1.jpg", "Interface\\im3_2.jpg"},
+		{"Interface\\im4_1.jpg", "Interface\\im4_2.jpg"},
+		{"Interface\\im5_1.jpg", "Interface\\im5_2.jpg"},
+		{"Interface\\im6_1.jpg", "Interface\\im6_2.jpg"},
+		{"Interface\\im7_1.jpg", "Interface\\im7_2.jpg"},
+		{"Interface\\im8_1.jpg", "Interface\\im8_2.jpg"}
+	};
 
+	std::copy_n(&apszIllustPath[0][0], 16, &m_apszIllustPath[0][0]);
+
+	// Set font size based on screen width and create the font
 	int nFontSize = 10;
-	switch(rInput.GetScreenWidth())
+	switch (rInput.GetScreenWidth())
 	{
-	case 800 :	nFontSize = 14;	break;
-	case 1024:	nFontSize = 18;	break;
-	case 1280:	nFontSize = 24;	break;
+	case 640: nFontSize = 10; break;
+	case 800: nFontSize = 12; break;
+	case 1024: nFontSize = 13; break;
+	case 1280: nFontSize = 13; break;
+	case 1366: nFontSize = 14; break;
+	case 1440: nFontSize = 16; break;
+	case 1600: nFontSize = 16; break;
+	case 1680: nFontSize = 16; break;
+	case 1920: nFontSize = 18; break;
 	}
 	m_hFont = CreateFont(nFontSize, 0, 0, 0, FW_BOLD, 0, 0, 0,DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,NONANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE,GlobalText[0][0] ? GlobalText[0] : NULL);
 

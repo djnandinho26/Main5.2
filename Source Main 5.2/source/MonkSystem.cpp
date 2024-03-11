@@ -11,6 +11,11 @@
 #include "ZzzLodTerrain.h"
 #include "wsclientinline.h"
 #include "CSChaosCastle.h"
+#include "LoadData.h"
+#include "CharacterManager.h"
+#include "SkillManager.h"
+#include "MapManager.h"
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -79,44 +84,57 @@ void CMonkSystem::RegistItem()
 
 	m_cItemEqualType.SetModelType(MODEL_SWORD+34, MODEL_SWORD_34_LEFT, MODEL_SWORD_34_RIGHT);
 	m_mapItemEqualType.insert(tm_ItemEqualType::value_type(m_cItemEqualType.GetModelType(), m_cItemEqualType));
+
+	m_cItemEqualType.SetModelType(MODEL_SWORD+35, MODEL_SWORD_35_LEFT, MODEL_SWORD_35_RIGHT);
+	m_mapItemEqualType.insert(tm_ItemEqualType::value_type(m_cItemEqualType.GetModelType(), m_cItemEqualType));
 }
 
 void CMonkSystem::LoadModelItem()
 {
-	AccessModel(MODEL_SWORD+32, "Data\\Item\\", "Sword33");	
-	AccessModel(MODEL_SWORD_32_LEFT, "Data\\Item\\", "SwordL33");
-	AccessModel(MODEL_SWORD_32_RIGHT, "Data\\Item\\", "SwordR33");
+	gLoadData.AccessModel(MODEL_SWORD+32, "Data\\Item\\", "Sword33");	
+	gLoadData.AccessModel(MODEL_SWORD_32_LEFT, "Data\\Item\\", "SwordL33");
+	gLoadData.AccessModel(MODEL_SWORD_32_RIGHT, "Data\\Item\\", "SwordR33");
 
-	AccessModel(MODEL_SWORD+33, "Data\\Item\\", "Sword34");	
-	AccessModel(MODEL_SWORD_33_LEFT, "Data\\Item\\", "SwordL34");
-	AccessModel(MODEL_SWORD_33_RIGHT, "Data\\Item\\", "SwordR34");
+	gLoadData.AccessModel(MODEL_SWORD+33, "Data\\Item\\", "Sword34");
+	gLoadData.AccessModel(MODEL_SWORD_33_LEFT, "Data\\Item\\", "SwordL34");
+	gLoadData.AccessModel(MODEL_SWORD_33_RIGHT, "Data\\Item\\", "SwordR34");
 
-	AccessModel(MODEL_SWORD+34, "Data\\Item\\", "Sword35");	
-	AccessModel(MODEL_SWORD_34_LEFT, "Data\\Item\\", "SwordL35");
-	AccessModel(MODEL_SWORD_34_RIGHT, "Data\\Item\\", "SwordR35");
+	gLoadData.AccessModel(MODEL_SWORD+34, "Data\\Item\\", "Sword35");
+	gLoadData.AccessModel(MODEL_SWORD_34_LEFT, "Data\\Item\\", "SwordL35");
+	gLoadData.AccessModel(MODEL_SWORD_34_RIGHT, "Data\\Item\\", "SwordR35");
 
-	AccessModel(MODEL_ARMORINVEN_60, "Data\\player\\", "Armor_inventory60");
-	AccessModel(MODEL_ARMORINVEN_61, "Data\\player\\", "ArmorMale61_inventory");
-	AccessModel(MODEL_ARMORINVEN_62, "Data\\player\\", "ArmorMale62_inventory");
+	gLoadData.AccessModel(MODEL_SWORD + 35, "Data\\Item\\", "Sword36");
+	gLoadData.AccessModel(MODEL_SWORD_35_LEFT, "Data\\Item\\", "Sword36L");
+	gLoadData.AccessModel(MODEL_SWORD_35_RIGHT, "Data\\Item\\", "Sword36R");
+
+	gLoadData.AccessModel(MODEL_ARMORINVEN_60, "Data\\player\\", "Armor_inventory60");
+	gLoadData.AccessModel(MODEL_ARMORINVEN_61, "Data\\player\\", "ArmorMale61_inventory");
+	gLoadData.AccessModel(MODEL_ARMORINVEN_62, "Data\\player\\", "ArmorMale62_inventory");
+	gLoadData.AccessModel(MODEL_ARMORINVEN_74, "Data\\player\\", "ArmorMale74_inven");
 }
 
 void CMonkSystem::LoadModelItemTexture()
 {
-	OpenTexture(MODEL_SWORD+32, "player\\");	
-	OpenTexture(MODEL_SWORD_32_LEFT, "player\\");
-	OpenTexture(MODEL_SWORD_32_RIGHT, "player\\");
+	gLoadData.OpenTexture(MODEL_SWORD+32, "player\\");
+	gLoadData.OpenTexture(MODEL_SWORD_32_LEFT, "player\\");
+	gLoadData.OpenTexture(MODEL_SWORD_32_RIGHT, "player\\");
 
-	OpenTexture(MODEL_SWORD+33, "Item\\");
-	OpenTexture(MODEL_SWORD_33_LEFT, "Item\\");
-	OpenTexture(MODEL_SWORD_33_RIGHT, "Item\\");
+	gLoadData.OpenTexture(MODEL_SWORD+33, "Item\\");
+	gLoadData.OpenTexture(MODEL_SWORD_33_LEFT, "Item\\");
+	gLoadData.OpenTexture(MODEL_SWORD_33_RIGHT, "Item\\");
 
-	OpenTexture(MODEL_SWORD+34, "player\\");
-	OpenTexture(MODEL_SWORD_34_LEFT, "player\\");
-	OpenTexture(MODEL_SWORD_34_RIGHT, "player\\");
+	gLoadData.OpenTexture(MODEL_SWORD+34, "player\\");
+	gLoadData.OpenTexture(MODEL_SWORD_34_LEFT, "player\\");
+	gLoadData.OpenTexture(MODEL_SWORD_34_RIGHT, "player\\");
+
+	gLoadData.OpenTexture(MODEL_SWORD+35, "player\\");
+	gLoadData.OpenTexture(MODEL_SWORD_35_LEFT, "player\\");
+	gLoadData.OpenTexture(MODEL_SWORD_35_RIGHT, "player\\");
 	
-	OpenTexture(MODEL_ARMORINVEN_60, "player\\");
-	OpenTexture(MODEL_ARMORINVEN_61, "player\\");
-	OpenTexture(MODEL_ARMORINVEN_62, "player\\");
+	gLoadData.OpenTexture(MODEL_ARMORINVEN_60, "player\\");
+	gLoadData.OpenTexture(MODEL_ARMORINVEN_61, "player\\");
+	gLoadData.OpenTexture(MODEL_ARMORINVEN_62, "player\\");
+	gLoadData.OpenTexture(MODEL_ARMORINVEN_74, "player\\");
 }
 
 int CMonkSystem::GetSubItemType(int _Type, int _Left)
@@ -191,7 +209,7 @@ int CMonkSystem::ModifyTypeCommonItemMonk(int _OrginalType)
 
 bool CMonkSystem::IsRagefighterCommonWeapon(BYTE _Class, int _Type)
 {
-	if((GetBaseClass(_Class) ==  CLASS_RAGEFIGHTER) && 
+	if((gCharacterManager.GetBaseClass(_Class) ==  CLASS_RAGEFIGHTER) && 
 	((_Type == MODEL_SWORD+0) || (_Type == MODEL_SWORD+1)
 	|| (_Type == MODEL_AXE+0) || (_Type == MODEL_AXE+1) || (_Type == MODEL_AXE+3)
 	|| (_Type == MODEL_MACE+0) || (_Type == MODEL_MACE+1) || (_Type == MODEL_MACE+2)
@@ -219,6 +237,13 @@ bool CMonkSystem::IsSwordformGloves(int _Type)
 		return true;
 	
 	return false;
+}
+
+void CMonkSystem::RenderPhoenixGloves(CHARACTER* _pCha, BYTE _Hand)
+{
+	PART_t* w = &_pCha->Weapon[_Hand];
+	w->LinkBone = _Hand ? 37 : 28;
+	RenderLinkObject(_Hand ? 100.f : 80.f, 10.0, -75.0, _pCha, w, MODEL_SWORD_35_WING, 0, 0, true, true, 0, 1);
 }
 
 void CMonkSystem::RenderSwordformGloves(CHARACTER *_pCha, int _ModelType, int _Hand, float _Alpha, bool _Translate, int _Select)
@@ -488,7 +513,7 @@ bool CMonkSystem::RageFighterEffect(OBJECT* _pObj, int _Type)
 		b->RenderBody(RENDER_BRIGHT|RENDER_COLOR, _pObj->Alpha, _pObj->BlendMesh, _pObj->BlendMeshLight, _pObj->BlendMeshTexCoordU, _pObj->BlendMeshTexCoordV);
 		b->RenderBody(RENDER_TEXTURE, fAlpha, _pObj->BlendMesh, _pObj->BlendMeshLight, _pObj->BlendMeshTexCoordU, _pObj->BlendMeshTexCoordV);
 		
-		return true;
+		return false;
 	}
 	return false;
 }
@@ -1279,6 +1304,24 @@ bool CMonkSystem::RageCreateEffect(OBJECT *_pObj, int _nSkill)
 			CreateEffect ( MODEL_MULTI_SHOT2, Position, _pObj->Angle, Light, 0);
 		}
 		break;
+	case AT_SKILL_PHOENIX_SHOT:
+		if (m_bUseEffectOnce)
+			return false;
+
+		m_bUseEffectOnce = true;
+
+#ifdef PBG_MOD_RAGEFIGHTERSOUND
+		if (_pObj->m_sTargetIndex < 0)
+			return true;
+#endif //PBG_MOD_RAGEFIGHTERSOUND
+		vec3_t Position, vAngle, Light;
+		_pObj->Owner = &CharactersClient[_pObj->m_sTargetIndex].Object;
+		VectorCopy(CharactersClient[_pObj->m_sTargetIndex].Object.Position, Position);
+		VectorCopy(_pObj->Angle, vAngle);
+		vAngle[2] = CreateAngle(_pObj->Position[0], _pObj->Position[1], Position[0], Position[1]);
+		Vector(1.f, 1.f, 1.f, Light);
+		CreateEffect(MODEL_PHOENIX_SHOT, Position, vAngle, Light, 0, _pObj, -1, 0, 0, 0, 1.f);
+		break;
 	default:
 		break;
 	}
@@ -1421,7 +1464,7 @@ void CDummyUnit::CalDummyPosition(vec3_t vOutPos, float& fAni)
 	}
 	fAni = m_fAniFrame;
 	float _fDisFrame = m_fDisFrame*0.7f;
-	if(InChaosCastle()
+	if(gMapManager.InChaosCastle()
 #ifdef PBG_MOD_RAGEFIGHTERSOUND
 		|| bChange
 #endif //PBG_MOD_RAGEFIGHTERSOUND

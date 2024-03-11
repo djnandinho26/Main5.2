@@ -3007,6 +3007,7 @@ CUITextInputBox::CUITextInputBox()
 CUITextInputBox::~CUITextInputBox()
 {
 	SetWindowLongW(m_hEditWnd, GWL_WNDPROC, (LONG)m_hOldProc);
+
 	m_hOldProc = NULL;
 
 	if(m_hEditWnd != NULL)
@@ -3057,7 +3058,7 @@ BOOL ClipboardCheck(HWND hWnd)
 LRESULT CALLBACK EditWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	CUITextInputBox *pTextInputBox = (CUITextInputBox *)GetWindowLongW(hWnd, GWL_USERDATA);
-	
+
 	if (pTextInputBox == NULL) 
 		return 0;
 
@@ -3333,6 +3334,7 @@ void CUITextInputBox::Init(HWND hWnd, int iWidth, int iHeight, int iMaxLength, B
 	if(m_hEditWnd)
 	{
 		SetTextLimit(iMaxLength);
+
 		m_hOldProc = (WNDPROC)SetWindowLongW(m_hEditWnd, GWL_WNDPROC, (LONG)EditWndProc);
 		SetWindowLongW(m_hEditWnd, GWL_USERDATA, (LONG)this);
 		ShowWindow(m_hEditWnd, SW_HIDE);
@@ -6134,7 +6136,7 @@ CUIBuyingListBox::CUIBuyingListBox()
 	SetSize(LISTBOX_WIDTH, LISTBOX_HEIGHT);
 }
 
-extern char TextList[30][100];
+extern char TextList[50][100];
 
 void CUIBuyingListBox::AddText(const char* pszExplanationText)
 {

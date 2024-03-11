@@ -309,37 +309,37 @@ void CNewUIInGameShop::SetRateScale(int _ItemType)
 }
 
 void CNewUIInGameShop::RenderDisplayItems()
-{		
+{
 	EndBitmap();
-	
+
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	glViewport2(0,0,WindowWidth,WindowHeight);
-	gluPerspective2(1.f, (float)(WindowWidth)/(float)(WindowHeight), RENDER_ITEMVIEW_NEAR, RENDER_ITEMVIEW_FAR);
+	glViewport2(0, 0, WindowWidth, WindowHeight);
+	gluPerspective2(2.0f, (float)(WindowWidth) / (float)(WindowHeight), RENDER_ITEMVIEW_NEAR, RENDER_ITEMVIEW_FAR);
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
 	GetOpenGLMatrix(CameraMatrix);
 	EnableDepthTest();
 	EnableDepthMask();
-	
+
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	for(int i=0 ; i<g_InGameShopSystem->GetSizePackageAsDisplayPackage() ; i++ )
+	for (int i = 0; i < g_InGameShopSystem->GetSizePackageAsDisplayPackage(); i++)
 	{
- 		int iPosX = IGS_ITEMRENDER_POS_X_STANDAD+(IMAGE_IGS_VIEWDETAIL_BTN_DISTANCE_X*(i%IGS_NUM_ITEMS_WIDTH));
-  		int iPosY = IGS_ITEMRENDER_POS_Y_STANDAD+(IMAGE_IGS_VIEWDETAIL_BTN_DISTANCE_Y*(i/IGS_NUM_ITEMS_HEIGHT));
+		int iPosX = IGS_ITEMRENDER_POS_X_STANDAD + (IMAGE_IGS_VIEWDETAIL_BTN_DISTANCE_X * (i % IGS_NUM_ITEMS_WIDTH));
+		int iPosY = IGS_ITEMRENDER_POS_Y_STANDAD + (IMAGE_IGS_VIEWDETAIL_BTN_DISTANCE_Y * (i / IGS_NUM_ITEMS_HEIGHT));
 		RenderItem3D(iPosX, iPosY, IGS_ITEMRENDER_POS_WIDTH, IGS_ITEMRENDER_POS_HEIGHT, g_InGameShopSystem->GetPackageItemCode(i), 0, 0, 0, true);
 	}
 
 	UpdateMousePositionn();
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
-	
+
 	BeginBitmap();
 }
 	

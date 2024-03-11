@@ -20,7 +20,6 @@
 vec3_t g_vParticleWind = { 0.0f, 0.0f, 0.0f};
 vec3_t g_vParticleWindVelo = { 0.0f, 0.0f, 0.0f};
 
-
 void HandPosition(PARTICLE *o)
 {
 	OBJECT *Owner = o->Target;
@@ -262,14 +261,10 @@ int CreateParticle(int Type,vec3_t Position,vec3_t Angle,vec3_t Light,int SubTyp
 				o->Angle[0] = 30.f;
 				Vector((float)(rand()%4+6)*0.1f,(float)(rand()%4+6)*0.1f,(float)(rand()%4+6)*0.1f,o->Light);
 				o->Position[2] += 260.f;
-				//CreateEffect(BITMAP_LIGHTNING+1,o->Position,o->Angle,o->Light);
-				//for(i=0;i<5;i++)
-     			//	CreateParticle(BITMAP_SMOKE,o->Position,o->Angle,o->Light,3);
 				break;
 			case BITMAP_CHROME_ENERGY2:
  				o->LifeTime = 8;
 				Vector(0.f,0.f,0.f,o->Velocity);
-				//Vector(0.f,-(float)(rand()%16+32)*0.1f,0.f,o->Velocity);
          		o->Scale = Scale*(float)(rand()%64+128)*0.01f;
 				o->Rotation = (float)(rand()%360);
 				break;

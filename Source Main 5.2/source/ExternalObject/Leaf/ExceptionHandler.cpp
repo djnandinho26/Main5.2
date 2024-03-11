@@ -87,45 +87,71 @@ bool CExceptionHandler::SaveDmpFile(const std::string& filename, CONTEXT* pConte
 	DmpHeader.Version = 0x03;
 	DmpHeader.HeaderSize = sizeof(DMPFILEHEADER);
 	
-	//. Creation infomation
-	time_t ltime;
-	time(&ltime);
-	DmpHeader.CreationTimeStamp = ltime;
+	//. Creation information
+	DmpHeader.CreationTimeStamp = time(nullptr);
 	
-	//. System infomation
-	std::string	strOSInfo;
-	GetOSInfoString(strOSInfo);
-	lstrcpyn(DmpHeader.OSInfoString, strOSInfo.c_str(),128);
-	
-	std::string	strCPUInfo;
-	GetCPUInfoString(strCPUInfo);
-	lstrcpyn(DmpHeader.CPUInfoString, strCPUInfo.c_str(),128);
-	
-	DmpHeader.MemStatus.dwLength = sizeof(MEMORYSTATUS);
-	::GlobalMemoryStatus(&DmpHeader.MemStatus);
-	
-	//. Process header infomation
-	DMPMODULEINFO ModuleInfo[64];
-	ZeroMemory(ModuleInfo, sizeof(DMPMODULEINFO)*64);
+	//. System information
+	OSVERSIONINFOEX osInfo;
+	ZeroMemory(&osInfo, sizeof(OSVERSIONINFOEX));
+	osInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	GetVersionEx((LPOSVERSIONINFO)&osInfo);
 
-	DMPMODULEINFO* pModuleInfo = ModuleInfo;
-	VS_FIXEDFILEINFO ImageFileInfo;
-	ZeroMemory(&ImageFileInfo, sizeof(VS_FIXEDFILEINFO));
+	char osInfoStr[128];
+	strncpy_s(osInfoStr, 128, (const char*)osInfo.szCSDVersion, 127);
+	strncat_s(osInfoStr, 128, " ", 1);
+	strncat_s(osInfoStr, 128, std::to_string(osInfo.dwMajorVersion).c_str(), 127);
+	strncat_s(osInfoStr, 128, ".", 1);
+	strncat_s(osInfoStr, 128, std::to_string(osInfo.dwMinorVersion).c_str(), 127);
+	strncpy_s(DmpHeader.OSInfoString, 128, osInfoStr, 127);
+
+	//. CPU information
+	SYSTEM_INFO sysInfo;
+	ZeroMemory(&sysInfo, sizeof(SYSTEM_INFO));
+	GetSystemInfo(&sysInfo);
+
+	char cpuInfoStr[128];
+	strncpy_s(cpuInfoStr, 128, "Processor architecture: ", 127);
+	strncat_s(cpuInfoStr, 128, std::to_string(sysInfo.wProcessorArchitecture).c_str(), 127);
+	strncat_s(cpuInfoStr, 128, ", Number of processors: ", 127);
+	strncat_s(cpuInfoStr, 128, std::to_string(sysInfo.dwNumberOfProcessors).c_str(), 127);
+	strncpy_s(DmpHeader.CPUInfoString, 128, cpuInfoStr, 127);
+
+	//. Ram Status
+	MEMORYSTATUSEX memStatus;
+	memStatus.dwLength = sizeof(memStatus);
+	if (GlobalMemoryStatusEx(&memStatus)) {
+		DmpHeader.MemStatus.dwLength = sizeof(MEMORYSTATUS);
+		DmpHeader.MemStatus.dwTotalPhys = memStatus.ullTotalPhys;
+		DmpHeader.MemStatus.dwAvailPhys = memStatus.ullAvailPhys;
+	}
+	else {
+		// Em caso de erro...
+	}
+
+	//. Process header information
+	std::vector<DMPMODULEINFO> ModuleInfo(64);
+	ModuleInfo.assign(64, DMPMODULEINFO());
+
+	DMPMODULEINFO* pModuleInfo = ModuleInfo.data();
+	VS_FIXEDFILEINFO ImageFileInfo = { 0 };
 	SetProcessInfoHeader(&DmpHeader.ProcessInfo, &pModuleInfo, 64, ImageFileInfo);
-	
+
 	//. Exception header infomation
 	SetExceptionInfoHeader(&DmpHeader.ExceptionInfo, pExceptionInfo);
 
 	//. Context infomation
 	memcpy(&DmpHeader.ContextRecord, pContext, sizeof(CONTEXT));
 	
-	//. Callstack infomation
+	//. Callstack information
 	leaf::CCallStackDump CallStackDmp;
 	CallStackDmp.Dump(pContext);
-	DmpHeader.CallStackDepth = CallStackDmp.GetStackDepth();
+	DmpHeader.CallStackDepth = static_cast<USHORT>(CallStackDmp.GetStackDepth());
 	
-	//. Write header
-	fwrite(&DmpHeader, sizeof(DMPFILEHEADER), 1, fd);
+	// Write header
+	size_t bytesWritten = fwrite(&DmpHeader, sizeof(DMPFILEHEADER), 1, fd);
+	if (bytesWritten != 1) {
+		// Handle error
+	}
 	
 	//. Write image file infomation
 	if(DmpHeader.ProcessInfo.IsExistFixedFileInfo)
@@ -137,33 +163,44 @@ bool CExceptionHandler::SaveDmpFile(const std::string& filename, CONTEXT* pConte
 		fwrite(&ModuleInfo[i], sizeof(DMPMODULEINFO), 1, fd);
 	}
 	
-	//. Write callstack infomation
-	for(int j=0; j<(int)CallStackDmp.GetStackDepth(); j++) 
+	//. Write callstack information
+	for (unsigned int j = 0; j < DmpHeader.CallStackDepth; j++)
 	{
 		DMPCALLSTACKFRAME DmpStackFrame;
 		DmpStackFrame.FrameAddr = (DWORD)CallStackDmp.GetFrameAddr(j);
 		DmpStackFrame.ReturnAddr = (DWORD)CallStackDmp.GetReturnAddr(j);
-		
 		DWORD pdwParameter[16];
 		CallStackDmp.GetParameter(j, pdwParameter, 16);
-		memcpy(DmpStackFrame.Parameter, pdwParameter, 16*sizeof(DWORD));
-		
+		memcpy(DmpStackFrame.Parameter, pdwParameter, 16 * sizeof(DWORD));
+
 		fwrite(&DmpStackFrame, sizeof(DMPCALLSTACKFRAME), 1, fd);
 	}
+
 	fclose(fd);
 	
 	return true;
 }
 
 bool CExceptionHandler::IsEnableCallback() const
-{ return (m_pfExceptionCallback == NULL) ? false : true; }
+{
+	if (m_pfExceptionCallback == NULL)
+		return false;
+	else
+		return true;
+}
+
 bool CExceptionHandler::CallExceptionCallback(_EXCEPTION_POINTERS* pExceptionInfo)
-{ return m_pfExceptionCallback(pExceptionInfo); }
+{
+	if (m_pfExceptionCallback != NULL)
+		return m_pfExceptionCallback(pExceptionInfo);
+	return false;
+}
 
 CExceptionHandler* CExceptionHandler::GetObjPtr() {
 	static CExceptionHandler s_Instance;
 	return &s_Instance;
 }
+
 LONG __stdcall CExceptionHandler::OnException(_EXCEPTION_POINTERS* pExceptionInfo) {
 	
 	bool bResult;
@@ -181,88 +218,66 @@ LONG __stdcall CExceptionHandler::OnException(_EXCEPTION_POINTERS* pExceptionInf
 
 void CExceptionHandler::SetProcessInfoHeader(DMPPROCESSINFOHEADER* pProcessInfoHeader, DMPMODULEINFO** ppModuleInfo, int MaxModules, VS_FIXEDFILEINFO& ImageFileInfo)
 {
-	if(pProcessInfoHeader && ppModuleInfo) {
-		
-		HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-		if(hProcessSnap != INVALID_HANDLE_VALUE) {
-			PROCESSENTRY32 ProcessEntry;
-			ZeroMemory(&ProcessEntry, sizeof(PROCESSENTRY32));
-			
-			ProcessEntry.dwSize = sizeof(PROCESSENTRY32);
-			if(Process32First(hProcessSnap, &ProcessEntry)) {
-				do {
-					if(ProcessEntry.th32ProcessID == GetCurrentProcessId()) {
-						pProcessInfoHeader->ProcessId = ProcessEntry.th32ProcessID;
-						
-						char szModuleFileName[256];
-						GetModuleFileName(NULL, szModuleFileName, 256);
-						lstrcpyn(pProcessInfoHeader->szImageName, szModuleFileName, 256);
-						
-						DWORD dwCrc32;
-						if(GenerateCrc32Code(pProcessInfoHeader->szImageName, dwCrc32))
-							pProcessInfoHeader->CheckSum32 = dwCrc32;
-						
-						pProcessInfoHeader->ThreadCount = ProcessEntry.cntThreads;
-						
-						break;
-					}
-				} while(Process32Next(hProcessSnap, &ProcessEntry));
-			}
-			CloseHandle(hProcessSnap);
-		}
-		
-		if(!pProcessInfoHeader->ProcessId) 
-		{
-			pProcessInfoHeader->ProcessId = GetCurrentProcessId();
-			
-			char szModuleFileName[256];
-			GetModuleFileName(NULL, szModuleFileName, 256);
-			lstrcpyn(pProcessInfoHeader->szImageName, szModuleFileName, 256);
-			
-			DWORD dwCrc32;
-			if(GenerateCrc32Code(pProcessInfoHeader->szImageName, dwCrc32))
-				pProcessInfoHeader->CheckSum32 = dwCrc32;
-		}
-		
+	if (pProcessInfoHeader && ppModuleInfo) {
+		// Get process information
+		pProcessInfoHeader->ProcessId = GetCurrentProcessId();
+		char szModuleFileName[256];
+		GetModuleFileName(NULL, szModuleFileName, 256);
+		lstrcpyn(pProcessInfoHeader->szImageName, szModuleFileName, 256);
+
+		DWORD dwCrc32;
+		if (GenerateCrc32Code(pProcessInfoHeader->szImageName, dwCrc32))
+			pProcessInfoHeader->CheckSum32 = dwCrc32;
+
+		pProcessInfoHeader->ThreadCount = GetCurrentProcessId(); // assuming the current process only has one thread
+
+		// Get version information
 		DWORD dwVersionInfoSize = GetFileVersionInfoSize(pProcessInfoHeader->szImageName, NULL);
-		if(dwVersionInfoSize > 0) {
+		if (dwVersionInfoSize > 0) {
 			BYTE* pbyData = new BYTE[dwVersionInfoSize];
 			GetFileVersionInfo(pProcessInfoHeader->szImageName, 0, dwVersionInfoSize, pbyData);
-			
+
 			VS_FIXEDFILEINFO* pFileInfoPointer = NULL;
-			pProcessInfoHeader->IsExistFixedFileInfo = (BYTE)VerQueryValue(pbyData, "\\", 
+			pProcessInfoHeader->IsExistFixedFileInfo = (BYTE)VerQueryValue(pbyData, "\\",
 				(LPVOID*)&pFileInfoPointer, (UINT*)&dwVersionInfoSize);
-			if(pProcessInfoHeader->IsExistFixedFileInfo)
+			if (pProcessInfoHeader->IsExistFixedFileInfo)
 				ImageFileInfo = *pFileInfoPointer;
-			
-			delete [] pbyData;
+
+			delete[] pbyData;
 		}
 
+		// Get module information
 		DWORD NumOfModules = 0;
 		HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pProcessInfoHeader->ProcessId);
-		if(hModuleSnap != INVALID_HANDLE_VALUE) {
+		if (hModuleSnap != INVALID_HANDLE_VALUE) {
 			MODULEENTRY32 ModuleEntry;
 			ZeroMemory(&ModuleEntry, sizeof(MODULEENTRY32));
-			
+
 			ModuleEntry.dwSize = sizeof(MODULEENTRY32);
-			if(Module32First(hModuleSnap, &ModuleEntry)) {
+			if (Module32First(hModuleSnap, &ModuleEntry)) {
 				do {
-					DMPMODULEINFO* pModuleInfo = (DMPMODULEINFO*)((*ppModuleInfo)+NumOfModules);
-					lstrcpyn(pModuleInfo->szModuleBaseName, ModuleEntry.szModule,128);
-					lstrcpyn(pModuleInfo->szModulePath, ModuleEntry.szExePath,256);
-					pModuleInfo->lpBaseAddr = ModuleEntry.modBaseAddr;
-					pModuleInfo->SizeOfModule = ModuleEntry.modBaseSize;
+					// Only add module info if there is enough space
+					if (NumOfModules < MaxModules) {
+						DMPMODULEINFO* pModuleInfo = (DMPMODULEINFO*)((*ppModuleInfo) + NumOfModules);
+						lstrcpyn(pModuleInfo->szModuleBaseName, ModuleEntry.szModule, 128);
+						lstrcpyn(pModuleInfo->szModulePath, ModuleEntry.szExePath, 256);
+						pModuleInfo->lpBaseAddr = ModuleEntry.modBaseAddr;
+						pModuleInfo->SizeOfModule = ModuleEntry.modBaseSize;
 
-					if((int)++NumOfModules >= MaxModules)
+						++NumOfModules;
+					}
+					else {
 						break;
+					}
 
-				} while(Module32Next(hModuleSnap, &ModuleEntry));
+				} while (Module32Next(hModuleSnap, &ModuleEntry));
 			}
-			pProcessInfoHeader->NumOfModules = NumOfModules;	//. set number of modules.
+			pProcessInfoHeader->NumOfModules = NumOfModules;    //. set number of modules.
 			CloseHandle(hModuleSnap);
 		}
 	}
 }
+
 void CExceptionHandler::SetExceptionInfoHeader(DMPEXCEPTIONINFOHEADER* pExceptionInfoHeader, _EXCEPTION_POINTERS* pExceptionInfo)
 {
 	if(pExceptionInfoHeader && pExceptionInfo) {
@@ -274,6 +289,7 @@ void CExceptionHandler::SetExceptionInfoHeader(DMPEXCEPTIONINFOHEADER* pExceptio
 		lstrcpyn(pExceptionInfoHeader->ExceptionCodeString, strExceptionCode.c_str(),128);
 	}
 }
+
 void CExceptionHandler::GetExceptionCodeString(IN PEXCEPTION_RECORD pExceptionRecord, OUT std::string& strType) {
 	switch(pExceptionRecord->ExceptionCode)
 	{

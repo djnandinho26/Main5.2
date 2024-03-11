@@ -4,69 +4,69 @@
 #include "stdafx.h"
 #include "w_ObjectInfo.h"
 
-void CInterpolateContainer::GetCurrentValue(vec3_t& v3Out, float fCurrentRate, VEC_INTERPOLATES& vecInterpolates )
+void CInterpolateContainer::GetCurrentValue(vec3_t& v3Out, float fCurrentRate, VEC_INTERPOLATES& vecInterpolates)
 {
 	VEC_INTERPOLATES::iterator	iterBegin = vecInterpolates.begin();
 	VEC_INTERPOLATES::iterator	iterEnd = vecInterpolates.end();
 	VEC_INTERPOLATES::iterator	iter_;
-	
-	INTERPOLATE_FACTOR*	pCurFactor = NULL;
+
+	INTERPOLATE_FACTOR* pCurFactor = NULL;
 
 	bool	bFindInterpolateFactor = false;
-	
-	for( iter_ = iterBegin; iter_ < iterEnd; ++iter_ )
+
+	for (iter_ = iterBegin; iter_ < iterEnd; ++iter_)
 	{
-		INTERPOLATE_FACTOR&	interpolateFactor = (*iter_);
-		
-		if( interpolateFactor.fRateStart <= fCurrentRate && interpolateFactor.fRateEnd > fCurrentRate )
+		INTERPOLATE_FACTOR& interpolateFactor = (*iter_);
+
+		if (interpolateFactor.fRateStart <= fCurrentRate && interpolateFactor.fRateEnd > fCurrentRate)
 		{
 			bFindInterpolateFactor = true;
 			pCurFactor = &interpolateFactor;
 			break;
 		}
 	}
-	
-	if( bFindInterpolateFactor==true )
+
+	if (bFindInterpolateFactor == true)
 	{
-		VectorInterpolation_F( v3Out,
-			pCurFactor->v3Start, 
-			pCurFactor->v3End, 
-			pCurFactor->fRateEnd - pCurFactor->fRateStart, 
-			fCurrentRate - pCurFactor->fRateStart );
+		VectorInterpolation_F(v3Out,
+			pCurFactor->v3Start,
+			pCurFactor->v3End,
+			pCurFactor->fRateEnd - pCurFactor->fRateStart,
+			fCurrentRate - pCurFactor->fRateStart);
 	}
-	
+
 }
 
-void CInterpolateContainer::GetCurrentValueF(float& fOut, float fCurrentRate, VEC_INTERPOLATES_F& vecInterpolates )
+void CInterpolateContainer::GetCurrentValueF(float& fOut, float fCurrentRate, VEC_INTERPOLATES_F& vecInterpolates)
 {
 	VEC_INTERPOLATES_F::iterator	iterBegin = vecInterpolates.begin();
 	VEC_INTERPOLATES_F::iterator	iterEnd = vecInterpolates.end();
 	VEC_INTERPOLATES_F::iterator	iter_;
-	
-	INTERPOLATE_FACTOR_F*	pCurFactor = NULL;
+
+	INTERPOLATE_FACTOR_F* pCurFactor = NULL;
 
 	bool	bFindInterpolateFactor = false;
-	
-	for( iter_ = iterBegin; iter_ < iterEnd; ++iter_ )
+
+	for (iter_ = iterBegin; iter_ < iterEnd; ++iter_)
 	{
-		INTERPOLATE_FACTOR_F&	interpolateFactor = (*iter_);
-		
-		if( interpolateFactor.fRateStart <= fCurrentRate && interpolateFactor.fRateEnd > fCurrentRate )
+		INTERPOLATE_FACTOR_F& interpolateFactor = (*iter_);
+
+		if (interpolateFactor.fRateStart <= fCurrentRate && interpolateFactor.fRateEnd > fCurrentRate)
 		{
 			bFindInterpolateFactor = true;
 			pCurFactor = &interpolateFactor;
 			break;
 		}
 	}
-	
-	if( bFindInterpolateFactor==true )
+
+	if (bFindInterpolateFactor == true)
 	{
-		LInterpolationF( fOut,
-			pCurFactor->fStart, 
-			pCurFactor->fEnd, 
-			(float)(fCurrentRate - pCurFactor->fRateStart)/(float)(pCurFactor->fRateEnd - pCurFactor->fRateStart) );
+		LInterpolationF(fOut,
+			pCurFactor->fStart,
+			pCurFactor->fEnd,
+			(float)(fCurrentRate - pCurFactor->fRateStart) / (float)(pCurFactor->fRateEnd - pCurFactor->fRateStart));
 	}
-	
+
 }
 
 void CInterpolateContainer::ClearContainer()
@@ -156,32 +156,32 @@ void OBJECT::Initialize()
 	PriorAnimationFrame = 0.0f;
 	AlphaTarget = 0.0f;
 	Alpha = 0.0f;
- 
-	IdentityMatrix( Matrix );
 
-	IdentityVector3D( Light );
-	IdentityVector3D( Direction );
-	IdentityVector3D( m_vPosSword );
-	IdentityVector3D( StartPosition );
-	IdentityVector3D( BoundingBoxMin );
-	IdentityVector3D( BoundingBoxMax );	
-	IdentityVector3D( m_vDownAngle );
-	IdentityVector3D( m_vDeadPosition );
-	IdentityVector3D( Position );
-	IdentityVector3D( Angle );
-	IdentityVector3D( HeadAngle );
-	IdentityVector3D( HeadTargetAngle );
-	IdentityVector3D( EyeLeft );
-	IdentityVector3D( EyeRight );
-	IdentityVector3D( EyeLeft2 );
-	IdentityVector3D( EyeRight2 );
-	IdentityVector3D( EyeLeft3 );
-	IdentityVector3D( EyeRight3 );
+	IdentityMatrix(Matrix);
 
-	IdentityVector3D( OBB.StartPos );
-	IdentityVector3D( OBB.XAxis );
-	IdentityVector3D( OBB.YAxis );
-	IdentityVector3D( OBB.ZAxis );
+	IdentityVector3D(Light);
+	IdentityVector3D(Direction);
+	IdentityVector3D(m_vPosSword);
+	IdentityVector3D(StartPosition);
+	IdentityVector3D(BoundingBoxMin);
+	IdentityVector3D(BoundingBoxMax);
+	IdentityVector3D(m_vDownAngle);
+	IdentityVector3D(m_vDeadPosition);
+	IdentityVector3D(Position);
+	IdentityVector3D(Angle);
+	IdentityVector3D(HeadAngle);
+	IdentityVector3D(HeadTargetAngle);
+	IdentityVector3D(EyeLeft);
+	IdentityVector3D(EyeRight);
+	IdentityVector3D(EyeLeft2);
+	IdentityVector3D(EyeRight2);
+	IdentityVector3D(EyeLeft3);
+	IdentityVector3D(EyeRight3);
+
+	IdentityVector3D(OBB.StartPos);
+	IdentityVector3D(OBB.XAxis);
+	IdentityVector3D(OBB.YAxis);
+	IdentityVector3D(OBB.ZAxis);
 
 	m_pCloth = NULL;
 	BoneTransform = NULL;

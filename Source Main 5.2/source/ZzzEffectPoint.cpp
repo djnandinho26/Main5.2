@@ -15,7 +15,7 @@
 #include "WSClient.h"
 
 
-PARTICLE  Points	[MAX_POINTS];
+PARTICLE Points [MAX_POINTS];
 
 int g_iLatestPoint = -1;
 
@@ -48,64 +48,58 @@ void CreatePoint(vec3_t Position,int Value,vec3_t Color,float scale, bool bMove)
 	}
 }
 
-void RenderPoints( BYTE byRenderOneMore )
-{
+void RenderPoints(BYTE byRenderOneMore) {
 	EnableAlphaTest();
-    DisableDepthTest();
-    for(int i=0;i<MAX_POINTS;i++)
-	{
-		PARTICLE *o = &Points[i];
-		if(o->Live)
-		{
-            if ( byRenderOneMore==1 )
-            {
-                if ( o->Position[2]>350.f ) continue;
-            }
-            else if ( byRenderOneMore==2 )
-            {
-                if ( o->Position[2]<=300.f ) continue;
-            }
-#ifdef PBG_ADD_NEWCHAR_MONK_SKILL
-			else if(o->bRepeatedly)
-			{
-				if( o->Position[2] <= o->fRepeatedlyHeight) continue;
+	DisableDepthTest();
+	for (int i = 0; i < MAX_POINTS; i++) {
+		PARTICLE* o = &Points[i];
+		if (o->Live) {
+			if (byRenderOneMore == 1) {
+				if (o->Position[2] > 350.f) {
+					continue;
+				}
 			}
-#endif //PBG_ADD_NEWCHAR_MONK_SKILL
-
-            RenderNumber(o->Position,o->Type,o->Angle,o->Gravity*0.4f,o->Scale);
+			else if (byRenderOneMore == 2) {
+				if (o->Position[2] <= 300.f) {
+					continue;
+				}
+			}
+#ifdef PBG_ADD_NEWCHAR_MONK_SKILL
+			else if (o->bRepeatedly) {
+				if (o->Position[2] <= o->fRepeatedlyHeight) {
+					continue;
+				}
+			}
+#endif // PBG_ADD_NEWCHAR_MONK_SKILL
+			RenderNumber(o->Position, o->Type, o->Angle, o->Gravity * 0.4f, o->Scale);
 		}
 	}
 }
 
-void MovePoints()
-{
-	for(int i=0;i<MAX_POINTS;i++)
-	{
-		PARTICLE *o = &Points[i];
-		if(o->Live)
-		{
+void MovePoints() {
+	for (int i = 0; i < MAX_POINTS; i++) {
+		PARTICLE* o = &Points[i];
+		if (o->Live) {
 			o->LifeTime--;
-			if(o->LifeTime < 0)
-			{
+			if (o->LifeTime < 0) {
 #ifdef PBG_ADD_NEWCHAR_MONK_SKILL
-				if(o->bRepeatedly && o->Position[2]>o->fRepeatedlyHeight)
-				{
+				if (o->bRepeatedly && o->Position[2] > o->fRepeatedlyHeight) {
 					o->Gravity = 10.0f;
 					o->bRepeatedly = false;
 				}
-#endif //PBG_ADD_NEWCHAR_MONK_SKILL
-                if ( o->bEnableMove )
-                {
-				    o->Position[2] += o->Gravity;
-                }
+#endif // PBG_ADD_NEWCHAR_MONK_SKILL
+				if (o->bEnableMove) {
+					o->Position[2] += o->Gravity;
+				}
 				o->Gravity -= 0.3f;
-				if(o->Gravity <= 0.f)
+				if (o->Gravity <= 0.f) {
 					o->Live = false;
-				if(o->Type != -2)
-				{
-					o->Scale -= 5.f;//20.f;
-					if(o->Scale < 15.f)
+				}
+				if (o->Type != -2) {
+					o->Scale -= 5.f;
+					if (o->Scale < 15.f) {
 						o->Scale = 15.f;
+					}
 				}
 			}
 		}

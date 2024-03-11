@@ -62,7 +62,7 @@ int Xor_ConvertBuffer( void *lpBuffer, int iSize, int iKey = 0)
 CErrorReport::CErrorReport()
 {
 	Clear();
-	Create("MuError.log");
+	//Create("MuError.log");
 }
 
 CErrorReport::~CErrorReport()
@@ -77,16 +77,18 @@ void CErrorReport::Clear( void)
 	m_iKey = 0;
 }
 
-void CErrorReport::Create( char *lpszFileName)
+void CErrorReport::Create(char* lpszFileName)
 {
-	strcpy( m_lpszFileName, lpszFileName);
-
-	//DeleteFile( m_lpszFileName);
+	strcpy_s(m_lpszFileName, MAX_PATH, lpszFileName); // Usa strcpy_s para garantir a segurança da cópia
 	m_iKey = 0;
-	m_hFile = CreateFile( m_lpszFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL, NULL);
+	m_hFile = CreateFile(m_lpszFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (m_hFile == INVALID_HANDLE_VALUE) 
+	{
+	}
 
 	CutHead();
-	SetFilePointer( m_hFile, 0, NULL, FILE_END);
+	SetFilePointer(m_hFile, 0, NULL, FILE_END);
 }
 
 void CErrorReport::Destroy( void)
@@ -95,26 +97,40 @@ void CErrorReport::Destroy( void)
 	Clear();
 }
 
-void CErrorReport::CutHead( void)
+void CErrorReport::CutHead()
 {
-	DWORD dwNumber;
-	char lpszBuffer[128*1024];
-	ReadFile( m_hFile, lpszBuffer, 128*1024-1, &dwNumber, NULL);
-	//m_iKey = Xor_ConvertBuffer( lpszBuffer, dwNumber);
-	lpszBuffer[dwNumber] = '\0';
-	char *lpCut = CheckHeadToCut( lpszBuffer, dwNumber);
-	if ( dwNumber >= 32*1024-1)
+	DWORD dwNumber = 0;
+	char lpszBuffer[128 * 1024];
+	// Read the file contents
+	if (!ReadFile(m_hFile, lpszBuffer, 128 * 1024 - 1, &dwNumber, NULL))
 	{
-		lpCut = &lpszBuffer[32*1024-1];
+		// Error handling
+		return;
 	}
-	if ( lpCut != lpszBuffer)
+	// Null-terminate the buffer
+	lpszBuffer[dwNumber] = '\0';
+	// Find the cut point
+	char* lpCut = CheckHeadToCut(lpszBuffer, dwNumber);
+	if (dwNumber >= 32 * 1024 - 1)
 	{
-		CloseHandle( m_hFile);
-		DeleteFile( m_lpszFileName);
-		m_hFile = CreateFile( m_lpszFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL, NULL);
-		DWORD dwSize = dwNumber - ( lpCut - lpszBuffer);
-		m_iKey = 0;
-		WriteFile( m_hFile, lpCut, dwSize, &dwNumber, NULL);
+		lpCut = &lpszBuffer[32 * 1024 - 1];
+	}
+	// Cut the head of the file
+	if (lpCut != lpszBuffer)
+	{
+		CloseHandle(m_hFile);
+		DeleteFile(m_lpszFileName);
+		m_hFile = CreateFile(m_lpszFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		DWORD dwSize = dwNumber - (lpCut - lpszBuffer);
+		if (dwSize > 0)
+		{
+			// Write the remaining content to the file
+			if (!WriteFile(m_hFile, lpCut, dwSize, &dwNumber, NULL))
+			{
+				// Error handling
+				return;
+			}
+		}
 	}
 }
 
@@ -150,11 +166,11 @@ char* CErrorReport::CheckHeadToCut( char *lpszBuffer, DWORD dwNumber)
 	return ( lpszBuffer);
 }
 
-BOOL CErrorReport::WriteFile( HANDLE hFile, void* lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)
+BOOL CErrorReport::WriteFile(HANDLE hFile, void* lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)
 {
-	//m_iKey = Xor_ConvertBuffer( lpBuffer, nNumberOfBytesToWrite, m_iKey);
-	return ( ::WriteFile( hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped));
+	return ::WriteFile(hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
 }
+
 
 void CErrorReport::WriteDebugInfoStr( char *lpszToWrite)
 {
@@ -182,28 +198,30 @@ void CErrorReport::Write( const char* lpszFormat, ...)
 	WriteDebugInfoStr( lpszBuffer);
 }
 
-void CErrorReport::HexWrite( void *pBuffer, int iSize)
+void CErrorReport::HexWrite(void* pBuffer, int iSize)
 {
 	DWORD dwWritten = 0;
-	char szLine[256] = {0, };
+	char szLine[256] = { 0 };
 	int offset = 0;
-	offset += sprintf(szLine, "0x%00000008X : ", (DWORD*)pBuffer);
-	for(int i=0; i<iSize; i++) {
-		offset += sprintf(szLine+offset,"%02X", *((BYTE*)pBuffer+i));
-		if(i > 0 && i < iSize-1) {
-			if(i%16 == 15) {	//. new line
-				offset += sprintf(szLine+offset, "\r\n");
-				WriteFile( m_hFile, szLine, strlen( szLine), &dwWritten, NULL);
+	DWORD_PTR ptr = reinterpret_cast<DWORD_PTR>(pBuffer);
+	offset += sprintf(szLine, "0x%08X:", ptr);
+	for (int i = 0; i < iSize; i++) {
+		offset += sprintf(szLine + offset, "%02X", ((BYTE)pBuffer + i));
+		if (i > 0 && i < iSize - 1) {
+			if (i % 16 == 15) { //. new line
+				offset += sprintf(szLine + offset, "\r\n");
+				WriteFile(m_hFile, szLine, static_cast<DWORD>(strlen(szLine)), &dwWritten, NULL);
 				offset = 0;
-				offset += sprintf(szLine+offset, "           : ");
+				ptr += 16;
+				offset += sprintf(szLine + offset, "0x%08X: ", ptr);
 			}
-			else if(i%4 == 3) { //. space
-				offset += sprintf(szLine+offset, " ");
+			else if (i % 4 == 3) { //. space
+				offset += sprintf(szLine + offset, " ");
 			}
 		}
 	}
-	offset += sprintf(szLine+offset, "\r\n");
-	WriteFile( m_hFile, szLine, strlen( szLine), &dwWritten, NULL);
+	offset += sprintf(szLine + offset, "\r\n");
+	WriteFile(m_hFile, szLine, static_cast<DWORD>(strlen(szLine)), &dwWritten, NULL);
 }
 
 void CErrorReport::AddSeparator( void)
@@ -227,27 +245,33 @@ void CErrorReport::WriteCurrentTime( BOOL bLineShift)
 	}
 }
 
-void CErrorReport::WriteSystemInfo( ER_SystemInfo *si)
+void CErrorReport::WriteSystemInfo(ER_SystemInfo* si)
 {
-	Write( "<System information>\r\n");
-	Write( "OS \t\t\t: %s\r\n", si->m_lpszOS);
-	Write( "CPU \t\t\t: %s\r\n", si->m_lpszCPU);
-	Write( "RAM \t\t\t: %dMB\r\n", 1+( si->m_iMemorySize/1024/1024));
+	Write("<System information>\r\n");
+	Write("OS\t\t\t: %s\r\n", si->m_lpszOS);
+	Write("CPU\t\t\t: %s\r\n", si->m_lpszCPU);
+	Write("RAM\t\t\t: %dMB\r\n", 1 + (si->m_iMemorySize / 1024 / 1024));
 	AddSeparator();
-	Write( "Direct-X \t\t: %s\r\n", si->m_lpszDxVersion);
+	Write("Direct-X\t\t: %s\r\n", si->m_lpszDxVersion);
 }
 
-void CErrorReport::WriteOpenGLInfo( void)
+void CErrorReport::WriteOpenGLInfo()
 {
-	Write( "<OpenGL information>\r\n");
-	Write( "Vendor\t\t: %s\r\n", ( char*)glGetString( GL_VENDOR));
-	Write( "Render\t\t: %s\r\n", ( char*)glGetString( GL_RENDERER));
-	Write( "OpenGL version\t: %s\r\n", ( char*)glGetString( GL_VERSION));
-	GLint iResult[2];
-	glGetIntegerv( GL_MAX_TEXTURE_SIZE, iResult);
-	Write( "Max Texture size\t: %d x %d\r\n", iResult[0], iResult[0]);
-	glGetIntegerv( GL_MAX_VIEWPORT_DIMS, iResult);
-	Write( "Max Viewport size\t: %d x %d\r\n", iResult[0], iResult[1]);
+	const char* vendor = (const char*)glGetString(GL_VENDOR);
+	const char* renderer = (const char*)glGetString(GL_RENDERER);
+	const char* version = (const char*)glGetString(GL_VERSION);
+	Write("<OpenGL information>\r\n");
+	Write("Vendor\t\t: %s\r\n", vendor ? vendor : "unknown");
+	Write("Renderer\t: %s\r\n", renderer ? renderer : "unknown");
+	Write("OpenGL version\t: %s\r\n", version ? version : "unknown");
+
+	GLint maxTextureSize[2] = { 0 };
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, maxTextureSize);
+	Write("Max Texture size\t: %d x %d\r\n", maxTextureSize[0], maxTextureSize[1]);
+
+	GLint maxViewportDims[2] = { 0 };
+	glGetIntegerv(GL_MAX_VIEWPORT_DIMS, maxViewportDims);
+	Write("Max Viewport size\t: %d x %d\r\n", maxViewportDims[0], maxViewportDims[1]);
 }
 
 void CErrorReport::WriteImeInfo( HWND hWnd)
@@ -334,121 +358,147 @@ void CErrorReport::WriteSoundCardInfo( void)
 	AddSeparator();
 }
 
-void GetOSVersion( ER_SystemInfo *si)
+void GetOSVersion(ER_SystemInfo* si) 
 {
-	char *lpszUnknown = "Unknown";
+	char* lpszUnknown = "Unknown";
 	char lpszTemp[256];
 
-	OSVERSIONINFO osiOne;
-	osiOne.dwOSVersionInfoSize = sizeof ( OSVERSIONINFO);
-	GetVersionEx( &osiOne);
+	OSVERSIONINFOEX osi;
+	ZeroMemory(&osi, sizeof(OSVERSIONINFOEX));
+	osi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	GetVersionEx((OSVERSIONINFO*)&osi);
 
 	int iBuildNumberType = 0;
-	wsprintf( si->m_lpszOS, "%s %d.%d ", lpszUnknown, osiOne.dwMajorVersion, osiOne.dwMinorVersion);
+	wsprintf( si->m_lpszOS, "%s %d.%d ", lpszUnknown, osi.dwMajorVersion, osi.dwMinorVersion);
 
-	switch ( osiOne.dwMajorVersion)
+	switch (osi.dwMajorVersion)
 	{
-	case 3:	// NT 3.51
-		switch ( osiOne.dwMinorVersion)
-		{
-		case 51:
-			strcpy( si->m_lpszOS, "Windows NT 3.51");
-			break;
-		}
-		break;
-	case 4:
-		switch ( osiOne.dwMinorVersion)
-		{
-		case 0:
-			switch ( osiOne.dwPlatformId)
-			{
-			case VER_PLATFORM_WIN32_WINDOWS:
-				strcpy( si->m_lpszOS, "Windows 95 ");
-				if ( osiOne.szCSDVersion[1] == 'C' || osiOne.szCSDVersion[1] == 'B')
-				{
-					strcat( si->m_lpszOS, "OSR2");
-				}
-				iBuildNumberType = 1;
-				break;
-			case VER_PLATFORM_WIN32_NT:
-				strcpy( si->m_lpszOS, "Windows NT 4.0 ");
-				break;
+	case 11:
+	{
+		if (osi.dwMinorVersion == 0) {
+			strcpy(si->m_lpszOS, "Windows 11");
+			if (osi.wProductType == VER_NT_WORKSTATION) {
+				strcat(si->m_lpszOS, " Home");
 			}
-			break;
-		case 10:
-			strcpy( si->m_lpszOS, "Windows 98 ");
-			if ( osiOne.szCSDVersion[1] == 'A')
-			{
-				strcat( si->m_lpszOS, "SE ");
+			else if (osi.wProductType == VER_NT_SERVER) {
+				strcat(si->m_lpszOS, " Server");
 			}
-			iBuildNumberType = 1;
-			break;
-		case 90:
-			strcpy( si->m_lpszOS, "Windows Me ");
-			iBuildNumberType = 1;
-			break;
-		}
-		break;
-	case 5:
-		switch ( osiOne.dwMinorVersion)
-		{
-		case 0:
-			strcpy( si->m_lpszOS, "Windows 2000 ");
-			{
-				HKEY hKey;
-				DWORD dwBufLen;
-				if ( ERROR_SUCCESS == RegOpenKeyEx( HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\ProductOptions",
-					0, KEY_QUERY_VALUE, &hKey))
-				{
-					if ( ERROR_SUCCESS == RegQueryValueEx( hKey, "ProductType", NULL, NULL, ( LPBYTE)lpszTemp, &dwBufLen))
-					{
-						if ( 0 == lstrcmpi( "WINNT", lpszTemp))
-						{
-							strcat( si->m_lpszOS, "Professional ");
-						}
-						if ( 0 == lstrcmpi( "LANMANNT", lpszTemp))
-						{
-							strcat( si->m_lpszOS, "Server ");
-						}
-						if ( 0 == lstrcmpi( "SERVERNT", lpszTemp))
-						{
-							strcat( si->m_lpszOS, "Advanced Server ");
-						}
-					}
-
-					RegCloseKey( hKey);
-				}
+			else if (osi.wProductType == VER_NT_DOMAIN_CONTROLLER) {
+				strcat(si->m_lpszOS, " Domain Controller");
 			}
-			break;
-		case 1:
-			strcpy( si->m_lpszOS, "Windows XP ");
-			break;
-		case 2:
-			strcpy( si->m_lpszOS, "Windows 2003 family ");
-			break;
 		}
 		break;
 	}
-	switch ( iBuildNumberType)
+	case 10:
 	{
-	case 0:
-		wsprintf( lpszTemp, "Build %d ", osiOne.dwBuildNumber);
-		break;
-	case 1:
-		wsprintf( lpszTemp, "Build %d.%d.%d ", HIBYTE( HIWORD( osiOne.dwBuildNumber)), LOBYTE( HIWORD( osiOne.dwBuildNumber)), LOWORD( osiOne.dwBuildNumber));
+		if (osi.dwMinorVersion == 0)
+		{
+			strcpy(si->m_lpszOS, "Windows 10");
+			if (osi.wProductType == VER_NT_WORKSTATION)
+			{
+				strcat(si->m_lpszOS, " Home");
+			}
+			else if (osi.wProductType == VER_NT_SERVER)
+			{
+				strcat(si->m_lpszOS, " Server");
+			}
+			else if (osi.wProductType == VER_NT_DOMAIN_CONTROLLER)
+			{
+				strcat(si->m_lpszOS, " Domain Controller");
+			}
+		}
+		else if (osi.dwMinorVersion == 1) {
+			strcpy(si->m_lpszOS, "Windows 10, version 1511");
+		}
+		else if (osi.dwMinorVersion == 2) {
+			strcpy(si->m_lpszOS, "Windows 10, version 1607");
+		}
+		else if (osi.dwMinorVersion == 3) {
+			strcpy(si->m_lpszOS, "Windows 10, version 1703");
+		}
+		else if (osi.dwMinorVersion == 4) {
+			strcpy(si->m_lpszOS, "Windows 10, version 1709");
+		}
+		else if (osi.dwMinorVersion == 5) {
+			strcpy(si->m_lpszOS, "Windows 10, version 1803");
+		}
+		else if (osi.dwMinorVersion == 6) {
+			strcpy(si->m_lpszOS, "Windows 10, version 1809");
+		}
+		else if (osi.dwMinorVersion == 7) {
+			strcpy(si->m_lpszOS, "Windows 10, version 1903");
+		}
+		else if (osi.dwMinorVersion == 8) {
+			strcpy(si->m_lpszOS, "Windows 10, version 1909");
+		}
+		else if (osi.dwMinorVersion == 9) {
+			strcpy(si->m_lpszOS, "Windows 10, version 2004");
+		}
+		else if (osi.dwMinorVersion == 10) {
+			strcpy(si->m_lpszOS, "Windows 10, version 20H2");
+		}
+		else if (osi.dwMinorVersion == 11) {
+			strcpy(si->m_lpszOS, "Windows 10, version 21H1");
+		}
 		break;
 	}
-	strcat( si->m_lpszOS, lpszTemp);
-	wsprintf( lpszTemp, "(%s)", osiOne.szCSDVersion);
-	strcat( si->m_lpszOS, lpszTemp);
+	case 6: {
+		if (osi.dwMinorVersion == 3) {
+			if (osi.wProductType == VER_NT_WORKSTATION) {
+				strcpy(si->m_lpszOS, "Windows 8.1");
+			}
+			else {
+				strcpy(si->m_lpszOS, "Windows Server 2012 R2");
+			}
+		}
+		else if (osi.dwMinorVersion == 2) {
+			if (osi.wProductType == VER_NT_WORKSTATION) {
+				strcpy(si->m_lpszOS, "Windows 8");
+			}
+			else {
+				strcpy(si->m_lpszOS, "Windows Server 2012");
+			}
+		}
+		else if (osi.dwMinorVersion == 1) {
+			if (osi.wProductType == VER_NT_WORKSTATION) {
+				strcpy(si->m_lpszOS, "Windows 7");
+			}
+			else {
+				strcpy(si->m_lpszOS, "Windows Server 2008 R2");
+			}
+		}
+		else if (osi.dwMinorVersion == 0) {
+			if (osi.wProductType == VER_NT_WORKSTATION) {
+				strcpy(si->m_lpszOS, "Windows Vista");
+			}
+			else {
+				strcpy(si->m_lpszOS, "Windows Server 2008");
+			}
+		}
+		break;
+	}
+		  switch (iBuildNumberType)
+		  {
+		  case 0:
+			  wsprintf(lpszTemp, "Build %d ", osi.dwBuildNumber);
+			  break;
+		  case 1:
+			  wsprintf(lpszTemp, "Build %d.%d.%d ", HIBYTE(HIWORD(osi.dwBuildNumber)), LOBYTE(HIWORD(osi.dwBuildNumber)), LOWORD(osi.dwBuildNumber));
+			  break;
+		  }
+		  strcat(si->m_lpszOS, lpszTemp);
+		  wsprintf(lpszTemp, "(%s)", osi.szCSDVersion);
+		  strcat(si->m_lpszOS, lpszTemp);
+	}
 }
 
-__int64 GetCPUFrequency( unsigned int uiMeasureMSecs)
+int64_t GetCPUFrequency(unsigned int uiMeasureMSecs)
 {
-	assert( uiMeasureMSecs > 0);
+	assert(uiMeasureMSecs > 0);
 
 	// First we get the CPUID standard level 0x00000001
-	DWORD reg;
+	uint32_t reg;
+
 	__asm
 	{
 		mov eax, 1
@@ -456,63 +506,63 @@ __int64 GetCPUFrequency( unsigned int uiMeasureMSecs)
 		mov reg, edx
 	}
 
-	// Then we check, if the RDTSC (Real Date Time Stamp Counter) is available.
+	// Then we check if the RDTSC (Real Date Time Stamp Counter) is available.
 	// This function is necessary for our measure process.
-	if ( !( reg & ( 1 << 4)))
+	if (!(reg & (1 << 4)))
 	{
-		return ( 0);
+		return 0;
 	}
 
-	// After that we declare some vars and check the frequency of the high
+	// After that, we declare some variables and check the frequency of the high
 	// resolution timer for the measure process.
 	// If there's no high-res timer, we exit.
-	__int64 llFreq;
-	if ( !QueryPerformanceFrequency( ( LARGE_INTEGER*) &llFreq))
+	int64_t llFreq;
+	if (!QueryPerformanceFrequency(reinterpret_cast<LARGE_INTEGER*>(&llFreq)))
 	{
-		return ( 0);
+		return 0;
 	}
 
 	// Now we can init the measure process. We set the process and thread priority
-	// to the highest available level (Realtime priority). Also we focus the
+	// to the highest available level (Realtime priority). Also, we focus on the
 	// first processor in the multiprocessor system.
 	HANDLE hProcess = GetCurrentProcess();
 	HANDLE hThread = GetCurrentThread();
 	DWORD dwCurPriorityClass = GetPriorityClass(hProcess);
 	int iCurThreadPriority = GetThreadPriority(hThread);
-	DWORD dwProcessMask, dwSystemMask, dwNewMask = 1;
+	DWORD_PTR dwProcessMask, dwSystemMask, dwNewMask = 1;
 	GetProcessAffinityMask(hProcess, &dwProcessMask, &dwSystemMask);
 
 	SetPriorityClass(hProcess, REALTIME_PRIORITY_CLASS);
 	SetThreadPriority(hThread, THREAD_PRIORITY_TIME_CRITICAL);
 	SetProcessAffinityMask(hProcess, dwNewMask);
 
-	// Now we call a CPUID to ensure, that all other prior called functions are
+	// Now we call a CPUID to ensure that all other prior called functions are
 	// completed now (serialization)
 	__asm { cpuid }
 
-	__int64 llStartTime, llEndTime;
-	__int64 llStart, llEnd;
+	int64_t llStartTime, llEndTime;
+	int64_t llStart, llEnd;
 	// We ask the high-res timer for the start time
-	QueryPerformanceCounter((LARGE_INTEGER *) &llStartTime);
-	// Then we get the current cpu clock and store it
-	__asm 
+	QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&llStartTime));
+	// Then we get the current CPU clock and store it
+	__asm
 	{
 		rdtsc
-		mov dword ptr [llStart+4], edx
-		mov dword ptr [llStart], eax
+		mov dword ptr[llStart + 4], edx
+		mov dword ptr[llStart], eax
 	}
 
-	// Now we wart for some msecs
+	// Now we wait for some milliseconds
 	Sleep(uiMeasureMSecs);
 
 	// We ask for the end time
-	QueryPerformanceCounter((LARGE_INTEGER *) &llEndTime);
-	// And also for the end cpu clock
-	__asm 
+	QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&llEndTime));
+	// And also for the end CPU clock
+	__asm
 	{
 		rdtsc
-		mov dword ptr [llEnd+4], edx
-		mov dword ptr [llEnd], eax
+		mov dword ptr[llEnd + 4], edx
+		mov dword ptr[llEnd], eax
 	}
 
 	// Now we can restore the default process and thread priorities
@@ -521,13 +571,14 @@ __int64 GetCPUFrequency( unsigned int uiMeasureMSecs)
 	SetPriorityClass(hProcess, dwCurPriorityClass);
 
 	// Then we calculate the time and clock differences
-	__int64 llDif = llEnd - llStart;
-	__int64 llTimeDif = llEndTime - llStartTime;
+	int64_t llDif = llEnd - llStart;
+	int64_t llTimeDif = llEndTime - llStartTime;
 
 	// And finally the frequency is the clock difference divided by the time
-	// difference. 
-	__int64 llFrequency = (__int64)((( double)llDif) / ((( double)llTimeDif) / llFreq));
-	// At last we just return the frequency that is also stored in the call
+	// difference.
+	int64_t llFrequency = static_cast<int64_t>(static_cast<double>(llDif) / (static_cast<double>(llTimeDif) / llFreq));
+
+	// At last, we just return the frequency that is also stored in the call
 	// member var uqwFrequency
 	return llFrequency;
 }
@@ -550,6 +601,7 @@ void GetCPUInfo( ER_SystemInfo *si)
 		mov edxreg, edx
 		mov ecxreg, ecx
 	}
+
 	int iBrand = ebxreg;
 	*((DWORD *) si->m_lpszCPU) = ebxreg;
 	*((DWORD *) (si->m_lpszCPU+4)) = edxreg;
@@ -559,6 +611,7 @@ void GetCPUInfo( ER_SystemInfo *si)
 	ulMaxSupportedLevel = eaxreg & 0xFFFF;
 	// Then we read the ext. CPUID level 0x80000000
 	// ...to check the max. supportted extended CPUID level
+
 	__asm
 	{
         mov eax, 0x80000000
@@ -574,6 +627,7 @@ void GetCPUInfo( ER_SystemInfo *si)
 		cpuid
 		mov eaxreg, eax
 	}
+
 	unsigned int uiFamily   = (eaxreg >> 8) & 0xF;
 	unsigned int uiModel    = (eaxreg >> 4) & 0xF;
 
@@ -700,17 +754,15 @@ void GetCPUInfo( ER_SystemInfo *si)
 	strcat( si->m_lpszCPU, lpszTemp);
 }
 
-
-typedef HRESULT(WINAPI * DIRECTDRAWCREATE)( GUID*, LPDIRECTDRAW*, IUnknown* );
-typedef HRESULT(WINAPI * DIRECTDRAWCREATEEX)( GUID*, VOID**, REFIID, IUnknown* );
-typedef HRESULT(WINAPI * DIRECTINPUTCREATE)( HINSTANCE, DWORD, LPDIRECTINPUT*,
-                                             IUnknown* );
+typedef HRESULT(WINAPI* LPDIRECTDRAWCREATE)(GUID*, LPDIRECTDRAW*, IUnknown*);
+typedef HRESULT(WINAPI* LPDIRECTDRAWCREATEEX)(GUID*, VOID**, REFIID, LPUNKNOWN);
+typedef HRESULT(WINAPI* LPDIRECTINPUTCREATE)(HINSTANCE, DWORD, LPDIRECTINPUT*, LPUNKNOWN);
 
 DWORD GetDXVersion()
 {
-    DIRECTDRAWCREATE     DirectDrawCreate   = NULL;
-    DIRECTDRAWCREATEEX   DirectDrawCreateEx = NULL;
-    DIRECTINPUTCREATE    DirectInputCreate  = NULL;
+    LPDIRECTDRAWCREATE   DirectDrawCreate   = NULL;
+	LPDIRECTDRAWCREATEEX DirectDrawCreateEx = NULL;
+	LPDIRECTINPUTCREATE  DirectInputCreate  = NULL;
     HINSTANCE            hDDrawDLL          = NULL;
     HINSTANCE            hDInputDLL         = NULL;
     HINSTANCE            hD3D8DLL           = NULL;
@@ -732,7 +784,7 @@ DWORD GetDXVersion()
     }
 
     // See if we can create the DirectDraw object.
-    DirectDrawCreate = (DIRECTDRAWCREATE)GetProcAddress( hDDrawDLL, "DirectDrawCreate" );
+    DirectDrawCreate = (LPDIRECTDRAWCREATE)GetProcAddress( hDDrawDLL, "DirectDrawCreate" );
     if( DirectDrawCreate == NULL )
     {
         dwDXVersion = 0;
@@ -784,7 +836,7 @@ DWORD GetDXVersion()
         return dwDXVersion;
     }
 
-    DirectInputCreate = (DIRECTINPUTCREATE)GetProcAddress( hDInputDLL,
+    DirectInputCreate = (LPDIRECTINPUTCREATE)GetProcAddress( hDInputDLL,
                                                         "DirectInputCreateA" );
     if( DirectInputCreate == NULL )
     {
@@ -897,7 +949,7 @@ DWORD GetDXVersion()
 
     // Check for DirectX 7 by creating a DDraw7 object
     LPDIRECTDRAW7 pDD7;
-    DirectDrawCreateEx = (DIRECTDRAWCREATEEX)GetProcAddress( hDDrawDLL,
+    DirectDrawCreateEx = (LPDIRECTDRAWCREATEEX)GetProcAddress( hDDrawDLL,
                                                        "DirectDrawCreateEx" );
     if( NULL == DirectDrawCreateEx )
     {
@@ -957,24 +1009,23 @@ DWORD GetDXVersion()
     return dwDXVersion;
 }
 
-void GetSystemInfo( ER_SystemInfo *si)
-{
-	ZeroMemory( si, sizeof ( ER_SystemInfo));
+void GetSystemInfo(ER_SystemInfo* si) {
+	// Clear memory
+	ZeroMemory(si, sizeof(ER_SystemInfo));
+	// Get CPU information
+	GetCPUInfo(si);
 
-	// CPU
-	GetCPUInfo( si);
+	// Get system memory information
+	MEMORYSTATUSEX ms;
+	ms.dwLength = sizeof(MEMORYSTATUSEX);
+	GlobalMemoryStatusEx(&ms);
+	si->m_iMemorySize = ms.ullTotalPhys;
 
-	// Memory
-	MEMORYSTATUS ms;
-	ms.dwLength = sizeof ( MEMORYSTATUS);
-	GlobalMemoryStatus( &ms);
-	si->m_iMemorySize = ms.dwTotalPhys;
+	// Get operating system information
+	GetOSVersion(si);
 
-	// OS
-	GetOSVersion( si);
-
-	// DX
+	// Get Direct X version information
 	DWORD dwDX = GetDXVersion();
-	wsprintf( si->m_lpszDxVersion, "Direct-X %d.%d", dwDX >> 8, dwDX & 0xFF);
+	sprintf_s(si->m_lpszDxVersion, sizeof(si->m_lpszDxVersion), "DirectX %d.%d", dwDX >> 8, dwDX & 0xFF);
 }
 

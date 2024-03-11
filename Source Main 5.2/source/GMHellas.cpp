@@ -22,9 +22,9 @@
 #include "SkillManager.h"
 
 extern  int  WaterTextureNumber;
-extern	char TextList[30][100];
-extern  int  TextListColor[30];
-extern	int  TextBold[30];
+extern	char TextList[50][100];
+extern  int  TextListColor[50];
+extern	int  TextBold[50];
 
 static  CSWaterTerrain* g_pCSWaterTerrain = NULL;
 static  std::queue<ObjectDescript> g_qObjDes;
@@ -133,7 +133,7 @@ BYTE GetHellasLevel(int Class, int Level)
     int startIndex = 0;
     if (gCharacterManager.GetBaseClass( Class )==CLASS_DARK || gCharacterManager.GetBaseClass( Class )==CLASS_DARK_LORD   
 #ifdef PBG_ADD_NEWCHAR_MONK
-		|| GetBaseClass( Class )==CLASS_RAGEFIGHTER
+		|| gCharacterManager.GetBaseClass( Class )==CLASS_RAGEFIGHTER
 #endif //PBG_ADD_NEWCHAR_MONK
 		)
     {
@@ -158,7 +158,7 @@ bool EnableKalima(int Class, int Level, int ItemLevel)
 
     if(gCharacterManager.GetBaseClass( Class ) == CLASS_DARK || gCharacterManager.GetBaseClass( Class ) == CLASS_DARK_LORD
 #ifdef PBG_ADD_NEWCHAR_MONK
-		|| GetBaseClass( Class ) == CLASS_RAGEFIGHTER
+		|| gCharacterManager.GetBaseClass( Class ) == CLASS_RAGEFIGHTER
 #endif //PBG_ADD_NEWCHAR_MONK
 		)
     {
@@ -181,7 +181,7 @@ bool GetUseLostMap ( bool bDrawAlert )
 
     if(gCharacterManager.GetBaseClass( Hero->Class )==CLASS_DARK || gCharacterManager.GetBaseClass( Hero->Class )==CLASS_DARK_LORD  
 #ifdef PBG_ADD_NEWCHAR_MONK
-		|| GetBaseClass( Hero->Class )==CLASS_RAGEFIGHTER
+		|| gCharacterManager.GetBaseClass( Hero->Class )==CLASS_RAGEFIGHTER
 #endif //PBG_ADD_NEWCHAR_MONK
 		)
     {
@@ -219,7 +219,7 @@ int RenderHellasItemInfo(ITEM* ip, int textNum )
             int startIndex = 0;
             if (gCharacterManager.GetBaseClass( Hero->Class )==CLASS_DARK || gCharacterManager.GetBaseClass( Hero->Class )==CLASS_DARK_LORD  
 #ifdef PBG_ADD_NEWCHAR_MONK
-					|| GetBaseClass( Hero->Class )==CLASS_RAGEFIGHTER
+					|| gCharacterManager.GetBaseClass( Hero->Class )==CLASS_RAGEFIGHTER
 #endif //PBG_ADD_NEWCHAR_MONK
 				)
             {

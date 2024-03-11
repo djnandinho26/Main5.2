@@ -2303,7 +2303,7 @@ void SEASON3B::CNewUISkillList::RenderSkillIcon(int iIndex, float x, float y, fl
 	ITEM* pRightRing = &CharacterMachine->Equipment[EQUIPMENT_RING_RIGHT];
 	
 	if(g_CMonkSystem.IsChangeringNotUseSkill(pLeftRing->Type, pRightRing->Type, pLeftRing->Level, pRightRing->Level)
-		&& (GetBaseClass(Hero->Class) == CLASS_RAGEFIGHTER))
+		&& (gCharacterManager.GetBaseClass(Hero->Class) == CLASS_RAGEFIGHTER))
 	{
 		bCantSkill = true;
 	}
@@ -2512,6 +2512,7 @@ void SEASON3B::CNewUISkillList::RenderSkillIcon(int iIndex, float x, float y, fl
 	{
 		glColor3f(1.f, 0.9f, 0.8f);
 		SEASON3B::RenderNumber(x+20, y+20, iHotKey);
+		glColor3f(1.f, 1.f, 1.f);
 	}
 
 #ifdef PBG_ADD_NEWCHAR_MONK_SKILL

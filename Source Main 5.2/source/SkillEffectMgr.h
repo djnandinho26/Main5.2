@@ -18,7 +18,6 @@ public:
 
 	bool DeleteEffect(int Type,OBJECT *Owner, int iSubType = -1);
 	void DeleteEffect( int efftype );
-	void DeleteAllEffects();
 
 	bool SearchEffect(int iType, OBJECT* pOwner, int iSubType = -1);
 	BOOL FindSameEffectOfSameOwner( int iType, OBJECT *pOwner);

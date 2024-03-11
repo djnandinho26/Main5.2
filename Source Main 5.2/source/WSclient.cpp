@@ -6094,7 +6094,7 @@ void ReceiveLevelUp( BYTE *ReceiveBuffer )
     CharacterAttribute->wMaxMinusPoint	= Data->wMaxMinusPoint;
 	
 	unicode::t_char szText[256] = {NULL, };
-	WORD iExp = CharacterAttribute->NextExperince - CharacterAttribute->Experience;
+	DWORD iExp = CharacterAttribute->NextExperince - CharacterAttribute->Experience;
 	sprintf(szText,GlobalText[486], iExp);
 	g_pChatListBox->AddText("", szText, SEASON3B::TYPE_SYSTEM_MESSAGE);
 
@@ -7245,7 +7245,7 @@ void Receive_Master_LevelUp( BYTE *ReceiveBuffer )
 	Master_Level_Data.wMaxBP			= Data->wMaxBP;
 	
 	unicode::t_char szText[256] = {NULL, };
-	WORD iExp = Master_Level_Data.lNext_MasterLevel_Experince - Master_Level_Data.lMasterLevel_Experince;
+	DWORD iExp = Master_Level_Data.lNext_MasterLevel_Experince - Master_Level_Data.lMasterLevel_Experince;
 	sprintf(szText, GlobalText[1750], iExp);
 	g_pChatListBox->AddText("", szText, SEASON3B::TYPE_SYSTEM_MESSAGE);
 	

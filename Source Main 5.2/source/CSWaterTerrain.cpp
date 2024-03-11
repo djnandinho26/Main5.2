@@ -30,63 +30,63 @@ void CSWaterTerrain::Init ( void )
     memset ( m_iWaveHeight, 0, sizeof( int )*WATER_TERRAIN_SIZE*WATER_TERRAIN_SIZE*4 );
 }
 
-void CSWaterTerrain::Update ( void )
+void CSWaterTerrain::Update()
 {
-    if ( !gMapManager.InHellas(m_iMapIndex) ) return;
+	if (!gMapManager.InHellas(m_iMapIndex))
+		return;
+	int WaveX;
+	int WaveY;
 
-    int WaveX;
-    int WaveY; 
-    //int Deep1 = (int)( 1050+sin(WorldTime*0.003f)*100 );
+	if ((MoveSceneFrame % 40) == 0)
+	{
+		WaveX = (Hero->PositionX * 2) + (rand() % 30) - 15;
+		WaveY = (Hero->PositionY * 2) + 25;
+		addSineWave(WaveX, WaveY, 20, 2, 2000);
+	}
 
-    if ( (MoveSceneFrame%40)==0 )
-    {
-        WaveX = ((Hero->PositionX)*2)+(rand()%30)-15;
-        WaveY = ((Hero->PositionY)*2)+25;
-        addSineWave ( WaveX, WaveY, 20, 2, 2000 );
-    }
-
-    m_iWaterPage ^= 1;
-    calcWave ();
-    calcBaseWave ();
+	m_iWaterPage ^= 1;
+	calcWave();
+	calcBaseWave();
 }
 
-void    CSWaterTerrain::Render ( void )
+void CSWaterTerrain::Render()
 {
-    if ( !gMapManager.InHellas(m_iMapIndex) ) return;
+	if (!gMapManager.InHellas(m_iMapIndex))
+		return;
+	CreateTerrain((Hero->PositionX) * 2, (Hero->PositionY) * 2);
 
-    CreateTerrain ( (Hero->PositionX)*2, (Hero->PositionY)*2 );
-
-    float alpha;
-    int   offset;
-    int   i, j;
-	for ( i=0; i<MAX_WATER_GRID*MAX_WATER_GRID; i++ )
+	float alpha;
+	int offset;
+	int i, j;
+	for (i = 0; i < MAX_WATER_GRID * MAX_WATER_GRID; i++)
 	{
-		float *Normal = m_Normals[i];
-		g_chrome[i][0] = Normal[2]*0.5f + 0.1f;
-		g_chrome[i][1] = Normal[1]*0.5f + 0.5f;
+		float* Normal = m_Normals[i];
+		g_chrome[i][0] = Normal[2] * 0.5f + 0.1f;
+		g_chrome[i][1] = Normal[1] * 0.5f + 0.5f;
 	}
 
-    EnableAlphaTest ();
-	BindTexture ( BITMAP_MAPTILE );
-	glBegin ( GL_TRIANGLES );
-    glColor3f ( 0.2f, 0.5f, 0.65f );
-	for ( j=0; j<m_iTriangleListNum; j++ )
+	EnableAlphaTest();
+	BindTexture(BITMAP_MAPTILE);
+	glBegin(GL_TRIANGLES);
+	glColor3f(0.2f, 0.5f, 0.65f);
+	for (j = 0; j < m_iTriangleListNum; j++)
 	{
-        offset = m_iTriangleList[j];
-		glTexCoord2f ( g_chrome[offset][1], g_chrome[offset][0] );
-        glVertex3fv ( m_Vertices[offset] );
+		offset = m_iTriangleList[j];
+		glTexCoord2f(g_chrome[offset][1], g_chrome[offset][0]);
+		glVertex3fv(m_Vertices[offset]);
 	}
 	glEnd();
-    EnableAlphaBlend ();
-	BindTexture ( BITMAP_MAPTILE+1 );
-	glBegin ( GL_TRIANGLES );
-	for ( j=0; j<m_iTriangleListNum; j++ )
+
+	EnableAlphaBlend();
+	BindTexture(BITMAP_MAPTILE + 1);
+	glBegin(GL_TRIANGLES);
+	for (j = 0; j < m_iTriangleListNum; j++)
 	{
-        offset = m_iTriangleList[j];
-        alpha = 1.f-DotProduct ( m_Normals[offset], m_vLightVector );
-        glColor3f( alpha, alpha*2.5f, alpha*3.f );//, alpha );
-		glTexCoord2f ( g_chrome[offset][1], g_chrome[offset][0] );
-        glVertex3fv ( m_Vertices[offset] );
+		offset = m_iTriangleList[j];
+		alpha = 1.f - DotProduct(m_Normals[offset], m_vLightVector);
+		glColor4f(alpha, alpha * 2.5f, alpha * 3.f, alpha);
+		glTexCoord2f(g_chrome[offset][1], g_chrome[offset][0]);
+		glVertex3fv(m_Vertices[offset]);
 	}
 	glEnd();
 }
@@ -221,46 +221,48 @@ void CSWaterTerrain::addSineWave ( int x, int y, int radiusX, int radiusY, int h
 	}
 }
 
-void    CSWaterTerrain::calcBaseWave ( void )
+void CSWaterTerrain::calcBaseWave()
 {
-/*
-    if ( (rand()%10)==0 )
-    {
-        m_iSelectWaveX = rand()%WATER_TERRAIN_SIZE;
-        m_iSelectWaveY = rand()%WATER_TERRAIN_SIZE;
-        m_iAddHeight   = rand()%20+10;
-    }
-*/
-    int MaxHeight;
-    int offset;
-    int HeroX = ( Hero->PositionX )*2;
-    int HeroY = ( Hero->PositionY )*2;
-/*
-    int HeroX = ( Hero->Object.Position[0]/TERRAIN_SCALE )*2;
-    int HeroY = ( Hero->Object.Position[1]/TERRAIN_SCALE )*2;
-*/
+	/*
+	if ((rand() % 10) == 0)
+	{
+	m_iSelectWaveX = rand() % WATER_TERRAIN_SIZE;
+	m_iSelectWaveY = rand() % WATER_TERRAIN_SIZE;
+	m_iAddHeight = rand() % 20 + 10;
+	}
+	*/
+	int MaxHeight;
+	int offset;
+	int HeroX = (Hero->PositionX) * 2;
+	int HeroY = (Hero->PositionY) * 2;
 
-    int StartX = max ( 0, HeroX-(VIEW_WATER_GRID/2) );
-    int StartY = max ( 0, HeroY-(VIEW_WATER_GRID/2) );
-    int EndX   = min ( WATER_TERRAIN_SIZE, HeroX+(VIEW_WATER_GRID/2) );
-    int EndY   = min ( WATER_TERRAIN_SIZE, HeroY+(VIEW_WATER_GRID/2) );
-	for ( int i=StartY; i<EndY; i++ )        //  y
-    {
-        for ( int j=StartX; j<EndX; j++ )    //  x
-        {
-            offset = j+(i*WATER_TERRAIN_SIZE);
+	/*
+	int HeroX = (Hero->Object.Position[0] / TERRAIN_SCALE) * 2;
+	int HeroY = (Hero->Object.Position[1] / TERRAIN_SCALE) * 2;
+	*/
 
-            //  큰 사인곡선
-            float alpha = 0.f;//TerrainMappingAlpha[(j/2)+(i/2)*WATER_TERRAIN_SIZE];
+	int StartX = max(0, HeroX - (VIEW_WATER_GRID / 2));
+	int StartY = max(0, HeroY - (VIEW_WATER_GRID / 2));
+	int EndX = min(WATER_TERRAIN_SIZE, HeroX + (VIEW_WATER_GRID / 2));
+	int EndY = min(WATER_TERRAIN_SIZE, HeroY + (VIEW_WATER_GRID / 2));
 
-            MaxHeight = (int)( sin( (WorldTime*0.005f)+(i*0.1f)+(j*0.1f) )*50*(1+alpha) );
-            m_iWaveHeight[2][offset] = (int) ( MaxHeight - sin ( (WorldTime*0.003f)+(j*0.1f)+(i*0.5f) )*50*(1+alpha) );
+	for (int i = StartY; i < EndY; i++)        //  y
+	{
+		for (int j = StartX; j < EndX; j++)    //  x
+		{
+			offset = j + (i * WATER_TERRAIN_SIZE);
 
-            //  작은 사인곡선
-            MaxHeight = (int)( sin( (WorldTime*0.001f)+(i*0.5f)+(j*0.5f) )*25*(1+alpha) );
-            m_iWaveHeight[3][offset] = (int) ( MaxHeight - sin ( (WorldTime*0.002f)+(j*1.f)+(i*0.3f) )*25*(1+alpha) );
-        }
-    }
+			//  큰 사인곡선
+			float alpha = 0.0f; //TerrainMappingAlpha[(j/2)+(i/2)*WATER_TERRAIN_SIZE];
+
+			MaxHeight = (int)(sin((WorldTime * 0.005f) + (i * 0.1f) + (j * 0.1f)) * 50 * (1 + alpha));
+			m_iWaveHeight[2][offset] = (int)(MaxHeight - sin((WorldTime * 0.003f) + (j * 0.1f) + (i * 0.5f)) * 50 * (1 + alpha));
+
+			//  작은 사인곡선
+			MaxHeight = (int)(sin((WorldTime * 0.001f) + (i * 0.5f) + (j * 0.5f)) * 25 * (1 + alpha));
+			m_iWaveHeight[3][offset] = (int)(MaxHeight - sin((WorldTime * 0.002f) + (j * 1.f) + (i * 0.3f)) * 25 * (1 + alpha));
+		}
+	}
 }
 
 void CSWaterTerrain::calcWave ( void )
@@ -309,99 +311,99 @@ float CSWaterTerrain::GetWaterTerrain ( float xf, float yf )
     return fHeight;
 }
 
-void CSWaterTerrain::RenderWaterAlphaBitmap ( int Texture, float xf, float yf, float SizeX, float SizeY, vec3_t Light, float Rotation, float Alpha, float Height )
+void CSWaterTerrain::RenderWaterAlphaBitmap(int Texture, float xf, float yf, float SizeX, float SizeY, vec3_t Light, float Rotation, float Alpha, float Height)
 {
-	if(Alpha==1.f)
-     	glColor3fv(Light);
+	if (Alpha == 1.0f)
+		glColor3fv(Light);
 	else
-     	glColor4f(Light[0],Light[1],Light[2],Alpha);
-
+		glColor4f(Light[0], Light[1], Light[2], Alpha);
 	vec3_t Angle;
-	Vector(0.f,0.f,Rotation,Angle);
+	Vector(0.0f, 0.0f, Rotation, Angle);
 	float Matrix[3][4];
-	AngleMatrix(Angle,Matrix);
-	
+	AngleMatrix(Angle, Matrix);
+
 	BindTexture(Texture);
-	float mxf = (xf/TERRAIN_SCALE*2);
-	float myf = (yf/TERRAIN_SCALE*2);
-	int   mxi = (int)(mxf);
-	int   myi = (int)(myf);
+	float mxf = (xf / TERRAIN_SCALE * 2);
+	float myf = (yf / TERRAIN_SCALE * 2);
+	int mxi = static_cast<int>(mxf);
+	int myi = static_cast<int>(myf);
 
 	float Size;
-	if(SizeX >= SizeY)
+	if (SizeX >= SizeY)
 		Size = SizeX;
 	else
 		Size = SizeY;
-	float TexU = (((float)mxi-mxf)+0.5f*Size);
-	float TexV = (((float)myi-myf)+0.5f*Size);
-	float TexScaleU = 1.f/Size;
-	float TexScaleV = 1.f/Size;
-	Size = (float)((int)Size+1);
-	float Aspect = SizeX/SizeY;
-    for(float y=-Size;y<=Size;y+=1.f)
+	float TexU = (((float)mxi - mxf) + 0.5f * Size);
+	float TexV = (((float)myi - myf) + 0.5f * Size);
+	float TexScaleU = 1.0f / Size;
+	float TexScaleV = 1.0f / Size;
+	Size = static_cast<float>(static_cast<int>(Size) + 1);
+	float Aspect = SizeX / SizeY;
+	for (float y = -Size; y <= Size; y += 1.0f)
 	{
-		for(float x=-Size;x<=Size;x+=1.f)
+		for (float x = -Size; x <= Size; x += 1.0f)
 		{
-			vec3_t p1[4],p2[4];
-			Vector((TexU+x    )*TexScaleU,(TexV+y    )*TexScaleV,0.f,p1[0]);
-			Vector((TexU+x+1.f)*TexScaleU,(TexV+y    )*TexScaleV,0.f,p1[1]);
-			Vector((TexU+x+1.f)*TexScaleU,(TexV+y+1.f)*TexScaleV,0.f,p1[2]);
-			Vector((TexU+x    )*TexScaleU,(TexV+y+1.f)*TexScaleV,0.f,p1[3]);
+			vec3_t p1[4], p2[4];
+			Vector((TexU + x) * TexScaleU, (TexV + y) * TexScaleV, 0.0f, p1[0]);
+			Vector((TexU + x + 1.0f) * TexScaleU, (TexV + y) * TexScaleV, 0.0f, p1[1]);
+			Vector((TexU + x + 1.0f) * TexScaleU, (TexV + y + 1.0f) * TexScaleV, 0.0f, p1[2]);
+			Vector((TexU + x) * TexScaleU, (TexV + y + 1.0f) * TexScaleV, 0.0f, p1[3]);
 			//bool Clip = false;
-			for(int i=0;i<4;i++) 
+			for (int i = 0; i < 4; i++)
 			{
 				p1[i][0] -= 0.5f;
 				p1[i][1] -= 0.5f;
-				VectorRotate(p1[i],Matrix,p2[i]);
+				VectorRotate(p1[i], Matrix, p2[i]);
 				p2[i][0] *= Aspect;
 				p2[i][0] += 0.5f;
 				p2[i][1] += 0.5f;
-				//if((p2[i][0]>=0.f && p2[i][0]<=1.f) || (p2[i][1]>=0.f && p2[i][1]<=1.f)) Clip = true;
+				//if ((p2[i][0] >= 0.0f && p2[i][0] <= 1.0f) || (p2[i][1] >= 0.0f && p2[i][1] <= 1.0f)) Clip = true;
 			}
-			//if(Clip==true)
-     			RenderWaterBitmapTile((float)mxi+x,(float)myi+y,1.f,1,p2,false,Alpha,Height);
+			//if (Clip == true)
+			RenderWaterBitmapTile(static_cast<float>(mxi) + x, static_cast<float>(myi) + y, 1.0f, 1, p2, false, Alpha, Height);
 		}
 	}
 }
-
-void    CSWaterTerrain::RenderWaterBitmapTile(float xf,float yf,float lodf,int lodi,vec3_t c[4],bool LightEnable,float Alpha,float Height)
+	
+void CSWaterTerrain::RenderWaterBitmapTile(float xf, float yf, float lodf, int lodi, vec3_t c[4], bool LightEnable, float Alpha, float Height)
 {
-    vec3_t TerrainVertex[4];
-	int xi = (int)xf;
-    int yi = (int)yf;
-	if(xi<0 || yi<0 || xi>=TERRAIN_SIZE_MASK || yi>=TERRAIN_SIZE_MASK) return;
+	vec3_t TerrainVertex[4];
+	int xi = static_cast<int>(xf);
+	int yi = static_cast<int>(yf);
+	if (xi < 0 || yi < 0 || xi >= TERRAIN_SIZE_MASK || yi >= TERRAIN_SIZE_MASK)
+		return;
 	float TileScale = WAVE_SCALE;
-    float sx = xf*WAVE_SCALE;
-    float sy = yf*WAVE_SCALE;
-	int TerrainIndex1 = xi+(yi*WATER_TERRAIN_SIZE);
-	int TerrainIndex2 = xi+lodi+(yi*WATER_TERRAIN_SIZE);
-	int TerrainIndex3 = xi+lodi+((yi+lodi)*WATER_TERRAIN_SIZE);
-	int TerrainIndex4 = xi+((yi+lodi)*WATER_TERRAIN_SIZE);
-	Vector(sx          ,sy          ,m_iWaveHeight[0][TerrainIndex1]+400.f+Height,TerrainVertex[0]);
-	Vector(sx+TileScale,sy          ,m_iWaveHeight[0][TerrainIndex2]+400.f+Height,TerrainVertex[1]);
-	Vector(sx+TileScale,sy+TileScale,m_iWaveHeight[0][TerrainIndex3]+400.f+Height,TerrainVertex[2]);
-	Vector(sx          ,sy+TileScale,m_iWaveHeight[0][TerrainIndex4]+400.f+Height,TerrainVertex[3]);
+	float sx = xf * WAVE_SCALE;
+	float sy = yf * WAVE_SCALE;
+	int TerrainIndex1 = xi + (yi * WATER_TERRAIN_SIZE);
+	int TerrainIndex2 = xi + lodi + (yi * WATER_TERRAIN_SIZE);
+	int TerrainIndex3 = xi + lodi + ((yi + lodi) * WATER_TERRAIN_SIZE);
+	int TerrainIndex4 = xi + ((yi + lodi) * WATER_TERRAIN_SIZE);
+	Vector(sx, sy, m_iWaveHeight[0][TerrainIndex1] + 400.0f + Height, TerrainVertex[0]);
+	Vector(sx + TileScale, sy, m_iWaveHeight[0][TerrainIndex2] + 400.0f + Height, TerrainVertex[1]);
+	Vector(sx + TileScale, sy + TileScale, m_iWaveHeight[0][TerrainIndex3] + 400.0f + Height, TerrainVertex[2]);
+	Vector(sx, sy + TileScale, m_iWaveHeight[0][TerrainIndex4] + 400.0f + Height, TerrainVertex[3]);
 
 	vec3_t Light[4];
-	if(LightEnable)
+	if (LightEnable)
 	{
-		VectorCopy(PrimaryTerrainLight[TerrainIndex1],Light[0]);
-		VectorCopy(PrimaryTerrainLight[TerrainIndex2],Light[1]);
-		VectorCopy(PrimaryTerrainLight[TerrainIndex3],Light[2]);
-		VectorCopy(PrimaryTerrainLight[TerrainIndex4],Light[3]);
+		VectorCopy(PrimaryTerrainLight[TerrainIndex1], Light[0]);
+		VectorCopy(PrimaryTerrainLight[TerrainIndex2], Light[1]);
+		VectorCopy(PrimaryTerrainLight[TerrainIndex3], Light[2]);
+		VectorCopy(PrimaryTerrainLight[TerrainIndex4], Light[3]);
 	}
 
 	glBegin(GL_TRIANGLE_FAN);
-	for(int i=0;i<4;i++)
+	for (int i = 0; i < 4; i++)
 	{
-		if(LightEnable)
+		if (LightEnable)
 		{
-			if(Alpha==1.f)
+			if (Alpha == 1.0f)
 				glColor3fv(Light[i]);
 			else
-				glColor4f(Light[i][0],Light[i][1],Light[i][2],Alpha);
+				glColor4f(Light[i][0], Light[i][1], Light[i][2], Alpha);
 		}
-		glTexCoord2f(c[i][0],c[i][1]);
+		glTexCoord2f(c[i][0], c[i][1]);
 		glVertex3fv(TerrainVertex[i]);
 	}
 	glEnd();

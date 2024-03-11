@@ -60,6 +60,10 @@
 
 #include "MultiLanguage.h"
 
+//Nvidia Update
+#include "nvapi.h"
+#include "NvApiDriverSettings.h"
+
 CUIMercenaryInputBox * g_pMercenaryInputBox = NULL;
 CUITextInputBox * g_pSingleTextInputBox = NULL;
 CUITextInputBox * g_pSinglePasswdInputBox = NULL;
@@ -92,7 +96,7 @@ HFONT     g_hFontBold = NULL;
 HFONT     g_hFontBig = NULL;
 HFONT     g_hFixFont = NULL;
 
-CTimer*		g_pTimer = NULL;	// performance counter.
+CTimer*	  g_pTimer = NULL;	// performance counter.
 bool      Destroy = false;
 bool      ActiveIME = false;
 
@@ -102,7 +106,7 @@ CHARACTER*			CharacterMemoryDump;
 
 int       RandomTable[100];
 
-char TextMu[]       = "mu.exe";
+char TextMu[]       = "MU.exe";
 
 CErrorReport g_ErrorReport;
 
@@ -475,6 +479,7 @@ void DestroyWindow()
 	if(shWnd)
 		SendMessage(shWnd, WM_DESTROY, 0, 0);
 }
+
 void DestroySound()
 {
 	for(int i=0;i<MAX_BUFFER;i++)
@@ -897,126 +902,66 @@ bool CreateOpenglWindow()
 	return true;
 }
 
-HWND StartWindow(HINSTANCE hCurrentInst,int nCmdShow)
+HWND StartWindow(HINSTANCE hInstance, int nCmdShow)
 {
-    char *windowName = "MU - Louis";
+	int majorVersion = 1;
+	int minorVersion = 0;
+	int patchNumber = 0;
 
-    WNDCLASS wndClass;
-    HWND hWnd;
-	
-    wndClass.style         = CS_OWNDC | CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-    wndClass.lpfnWndProc   = WndProc;
-    wndClass.cbClsExtra    = 0;
-    wndClass.cbWndExtra    = 0;
-    wndClass.hInstance     = hCurrentInst;
-    wndClass.hIcon		   = LoadIcon(hCurrentInst, (LPCTSTR)IDI_ICON1);
-    wndClass.hCursor	   = LoadCursor(NULL, IDC_ARROW);
-    wndClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-    wndClass.lpszMenuName  = NULL;
-    wndClass.lpszClassName = windowName;
-    RegisterClass(&wndClass);
+	std::string buildDate = "25/05/23";
+	std::string updateVersion = std::to_string(majorVersion) + "." + std::to_string(minorVersion) + "." + std::to_string(patchNumber) + "-" + buildDate.substr(6, 2) + buildDate.substr(3, 2) + buildDate.substr(0, 2);
 
-#ifdef ENABLE_FULLSCREEN
+	std::cout << "Update Version: " << updateVersion << std::endl;
+
+	char windowTitle[256];
+
+	sprintf(windowTitle, "MU (%s)", updateVersion.c_str());
+
+	WNDCLASS wndClass;
+	HWND hWnd;
+
+	wndClass.style = CS_HREDRAW | CS_VREDRAW;
+	wndClass.lpfnWndProc = WndProc;
+	wndClass.cbClsExtra = 0;
+	wndClass.cbWndExtra = 0;
+	wndClass.hInstance = hInstance;
+	wndClass.hIcon = LoadIcon(hInstance, (LPCTSTR)IDI_ICON1);
+	wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	wndClass.lpszMenuName = NULL;
+	wndClass.lpszClassName = windowTitle;
+
+	if (!RegisterClass(&wndClass))
 	{
-#ifndef FOR_WORK
-#if defined USER_WINDOW_MODE || (defined WINDOWMODE)
-		if (g_bUseWindowMode == TRUE)
-		{
-			RECT rc = { 0, 0, WindowWidth, WindowHeight };
-#if defined WINDOWMODE
-			if (g_bUseWindowMode == TRUE)
-				AdjustWindowRect(&rc, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_BORDER | WS_CLIPCHILDREN, NULL);
-			else
-#endif	//WINDOWMODE
-			AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, NULL);
-			rc.right -= rc.left;
-			rc.bottom -= rc.top;
+		MessageBox(NULL, "Windows aplication error!", "Aplication Error", MB_ICONERROR);
+		return 0;
+	}
 
-#if defined WINDOWMODE
-			if (g_bUseWindowMode == TRUE)
-			{
-			hWnd = CreateWindow(
-				windowName, windowName,
-				WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_BORDER | WS_CLIPCHILDREN,
-				(GetSystemMetrics(SM_CXSCREEN) - rc.right) / 2,
-				(GetSystemMetrics(SM_CYSCREEN) - rc.bottom) / 2,
-				rc.right,
-				rc.bottom,
-				NULL, NULL, hCurrentInst, NULL);
-			}
-			else
-#endif//WINDOWMODE
-			{
-			hWnd = CreateWindow(
-				windowName, windowName,
-				WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
-				(GetSystemMetrics(SM_CXSCREEN) - rc.right) / 2,
-				(GetSystemMetrics(SM_CYSCREEN) - rc.bottom) / 2,
-				rc.right,
-				rc.bottom,
-				NULL, NULL, hCurrentInst, NULL);
-			}
-		}
-		else
-#endif//WINDOWMODE
-		{
-			hWnd = CreateWindowEx( WS_EX_TOPMOST | WS_EX_APPWINDOW,
-				windowName, windowName,
-				WS_POPUP,
-				0, 0,
-				WindowWidth,
-				WindowHeight,
-				NULL, NULL, hCurrentInst, NULL);
-		}
-#else //FOR_WORK
+	if (g_bUseWindowMode == TRUE)
+	{
+		RECT rc = { 0, 0, WindowWidth, WindowHeight };
+		AdjustWindowRect(&rc, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_BORDER | WS_CLIPCHILDREN, NULL);
 		hWnd = CreateWindow(
-			windowName, windowName,
+			windowTitle, windowTitle,
+			WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_BORDER | WS_CLIPCHILDREN,
+			(GetSystemMetrics(SM_CXSCREEN) - rc.right) / 2,
+			(GetSystemMetrics(SM_CYSCREEN) - rc.bottom) / 2,
+			rc.right - rc.left,
+			rc.bottom - rc.top,
+			NULL, NULL, hInstance, NULL);
+	}
+	else
+	{
+		hWnd = CreateWindowEx(
+			WS_EX_TOPMOST | WS_EX_APPWINDOW,
+			windowTitle, windowTitle,
 			WS_POPUP,
 			0, 0,
 			WindowWidth,
 			WindowHeight,
-			NULL, NULL, hCurrentInst, NULL);
-#endif
+			NULL, NULL, hInstance, NULL);
 	}
-#else //ENABLE_FULLSCREEN
-	{
-		RECT rc = { 0, 0, WindowWidth, WindowHeight };
-#if defined WINDOWMODE
-		if (g_bUseWindowMode == TRUE)
-			AdjustWindowRect(&rc, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_BORDER | WS_CLIPCHILDREN, NULL);
-		else
-#endif
-		AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, NULL);
-		rc.right -= rc.left;
-		rc.bottom -= rc.top;
-#if defined WINDOWMODE
-		if (g_bUseWindowMode == TRUE)
-		{
-		hWnd = CreateWindow(
-			windowName, windowName,
-			WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_BORDER | WS_CLIPCHILDREN,
-			(GetSystemMetrics(SM_CXSCREEN) - rc.right) / 2,
-			(GetSystemMetrics(SM_CYSCREEN) - rc.bottom) / 2,
-			rc.right,
-			rc.bottom,
-			NULL, NULL, hCurrentInst, NULL);
-		}
-		else
-#endif
-		{
-		hWnd = CreateWindow(
-			windowName, windowName,
-			WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
-			(GetSystemMetrics(SM_CXSCREEN) - rc.right) / 2,
-			(GetSystemMetrics(SM_CYSCREEN) - rc.bottom) / 2,
-			rc.right,
-			rc.bottom,
-			NULL, NULL, hCurrentInst, NULL);
-		}
-	}
-#endif //ENABLE_FULLSCREEN
-	
-    return hWnd;
+	return hWnd;
 }
 
 char m_ID[11];
@@ -1038,49 +983,48 @@ BOOL OpenInitFile()
 	char szCurrentDir[256];
 
 	GetCurrentDirectory(256, szCurrentDir);
-
+#ifdef ADD_START_CONFIG_FILE
 	strcpy(szIniFilePath, szCurrentDir);
 	if( szCurrentDir[strlen(szCurrentDir)-1] == '\\' ) 
 		strcat(szIniFilePath, "config.ini");
 	else strcat(szIniFilePath, "\\config.ini");
 
 	GetPrivateProfileString ("LOGIN", "Version", "", m_Version, 11, szIniFilePath);
+#endif //ADD_START_CONFIG_FILE
 
-	char *lpszCommandLine = GetCommandLine();
+	char* lpszCommandLine = GetCommandLine();
 	char lpszFile[MAX_PATH];
-	if ( GetFileNameOfFilePath( lpszFile, lpszCommandLine))
+	if (GetFileNameOfFilePath(lpszFile, lpszCommandLine))
 	{
 		WORD wVersion[4];
-		if ( GetFileVersion( lpszFile, wVersion))
+		if (GetFileVersion(lpszFile, wVersion))
 		{
-			sprintf( m_ExeVersion, "%d.%02d", wVersion[0], wVersion[1]);
-			if ( wVersion[2] > 0)
+			char lpszMinorVersion[3] = "a";
+			sprintf(m_ExeVersion, "%d.%02d", wVersion[0], wVersion[1]);
+			if (wVersion[2] > 0)
 			{
-                char lpszMinorVersion[3] = "a";
-                if ( wVersion[2]>26 )
-                {
-                    lpszMinorVersion[0] = 'A';
-				    lpszMinorVersion[0] += ( wVersion[2] - 27 );
-                    lpszMinorVersion[1] = '+';
-                }
-                else
-                {
-				    lpszMinorVersion[0] += ( wVersion[2] - 1);
-                }
-				strcat( m_ExeVersion, lpszMinorVersion);
+				if (wVersion[2] > 26)
+				{
+					lpszMinorVersion[0] = 'A';
+					lpszMinorVersion[0] += (wVersion[2] - 27);
+					lpszMinorVersion[1] = '+';
+				}
+				else
+				{
+					lpszMinorVersion[0] += (wVersion[2] - 1);
+				}
+				strcat(m_ExeVersion, lpszMinorVersion);
 			}
 		}
 		else
 		{
-			strcpy( m_ExeVersion, m_Version);
+			strcpy(m_ExeVersion, m_Version);
 		}
 	}
 	else
 	{
-		strcpy( m_ExeVersion, m_Version);
+		strcpy(m_ExeVersion, m_Version);
 	}
-
-//#ifdef _DEBUG
 
 	m_ID[0] = '\0';
 	m_SoundOnOff = 1;
@@ -1126,34 +1070,70 @@ BOOL OpenInitFile()
 
 		g_iChatInputType = 1;
 
-#if defined USER_WINDOW_MODE || (defined WINDOWMODE)
 		dwSize = sizeof ( int);
 		if ( RegQueryValueEx (hKey, "WindowMode", 0, NULL, (LPBYTE) & g_bUseWindowMode, &dwSize) != ERROR_SUCCESS)
 		{
 			g_bUseWindowMode = FALSE;
 		}
-#endif // USER_WINDOW_MODE
 
 		dwSize = MAX_LANGUAGE_NAME_LENGTH;
 		if ( RegQueryValueEx (hKey, "LangSelection", 0, NULL, (LPBYTE)g_aszMLSelection, &dwSize) != ERROR_SUCCESS)
 		{
-			strcpy(g_aszMLSelection, "Eng");
+			strcpy_s(g_aszMLSelection, "Portugês");
 		}
 		g_strSelectedML = g_aszMLSelection;
 	}
 	RegCloseKey( hKey);
 
-	switch(m_Resolution)
+	switch (m_Resolution)
 	{
-	case 0:WindowWidth=640 ;WindowHeight=480 ;break;
-	case 1:WindowWidth=800 ;WindowHeight=600 ;break;
-	case 2:WindowWidth=1024;WindowHeight=768 ;break;
-	case 3:WindowWidth=1280;WindowHeight=1024;break;
-	//case 3:WindowWidth=1920;WindowHeight=1440;break;
-	case 4:WindowWidth=1600;WindowHeight=1200;break;
+	case 0:
+		WindowWidth = 640;
+		WindowHeight = 480;
+		break;
+	case 1:
+		WindowWidth = 800;
+		WindowHeight = 600;
+		break;
+	case 2:
+		WindowWidth = 1024;
+		WindowHeight = 768;
+		break;
+	case 3:
+		WindowWidth = 1280;
+		WindowHeight = 768;
+		break;
+	case 4:
+		WindowWidth = 1366;
+		WindowHeight = 768;
+		break;
+	case 5:
+		WindowWidth = 1440;
+		WindowHeight = 900;
+		break;
+	case 6:
+		WindowWidth = 1600;
+		WindowHeight = 900;
+		break;
+	case 7:
+		WindowWidth = 1600;
+		WindowHeight = 1280;
+		break;
+	case 8:
+		WindowWidth = 1680;
+		WindowHeight = 1050;
+		break;
+	case 9:
+		WindowWidth = 1920;
+		WindowHeight = 1080;
+		break;
+	default:
+		WindowWidth = 640;
+		WindowHeight = 480;
+		break;
 	}
-	
-	g_fScreenRate_x = (float)WindowWidth / 640;		// ¡Ø
+
+	g_fScreenRate_x = (float)WindowWidth / 640;
 	g_fScreenRate_y = (float)WindowHeight / 480;
 
 	return TRUE;
@@ -1315,7 +1295,21 @@ bool ExceptionCallback(_EXCEPTION_POINTERS* pExceptionInfo )
 	return true;
 }
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int nCmdShow)
+//Nvidia Update
+extern "C"
+{
+	_declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 0x00000001;
+}
+
+// Force NVidia Optimus to use NVidia GPU on drivers 302 and later.
+// http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
+extern "C" {
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}
+
+int APIENTRY WinMain(_In_ HINSTANCE hInstance, 
+	                 _In_opt_ HINSTANCE hPrevInstance, 
+	                 _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
 	MSG msg;
 
@@ -1343,7 +1337,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
 	g_ErrorReport.Write( "\r\n");
 	g_ErrorReport.WriteLogBegin();
 	g_ErrorReport.AddSeparator();
-	g_ErrorReport.Write( "Mu online %s (%s) executed. (%d.%d.%d.%d)\r\n", lpszExeVersion, "Eng", wVersion[0], wVersion[1], wVersion[2], wVersion[3]);
+	g_ErrorReport.Write( "Mu Online %s (%s) executed. (%d.%d.%d.%d)\r\n", lpszExeVersion, "PT-BR", wVersion[0], wVersion[1], wVersion[2], wVersion[3]);
 
 	g_ConsoleDebug->Write(MCD_NORMAL, "Mu Online (Version: %d.%d.%d.%d)", wVersion[0], wVersion[1], wVersion[2], wVersion[3]);
 
@@ -1358,7 +1352,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
 	// PKD_ADD_BINARY_PROTECTION
 	VM_START
 	WORD wPortNumber;	
-	if ( GetConnectServerInfo( szCmdLine, g_lpszCmdURL, &wPortNumber))
+	if ( GetConnectServerInfo( lpCmdLine, g_lpszCmdURL, &wPortNumber))
 	{
 		szServerIpAddress = g_lpszCmdURL;
 		g_ServerPort = wPortNumber;
@@ -1453,14 +1447,19 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
 	//g_ErrorReport.WriteImeInfo( g_hWnd);
 	g_ErrorReport.AddSeparator();
 	
-	switch(WindowWidth)
+	switch (WindowWidth)
 	{
-	case 640 :FontHeight = 12;break;
-	case 800 :FontHeight = 13;break;
-	case 1024:FontHeight = 14;break;
-	case 1280:FontHeight = 15;break;
+	case 640:FontHeight = 10; break;
+	case 800:FontHeight = 12; break;
+	case 1024:FontHeight = 13; break;
+	case 1280:FontHeight = 13; break;
+	case 1366:FontHeight = 14; break;	
+	case 1440:FontHeight = 16; break;
+	case 1600:FontHeight = 16; break;
+	case 1680:FontHeight = 16; break;
+	case 1920:FontHeight = 18; break;
 	}
-	
+
 	int nFixFontHeight = 13;
 	int nFixFontSize;
 	int iFontSize;
@@ -1468,10 +1467,16 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
 	iFontSize = FontHeight - 1;
 	nFixFontSize = nFixFontHeight - 1;
 
-	g_hFont		= CreateFont(iFontSize,0,0,0,FW_NORMAL,0,0,0,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,NONANTIALIASED_QUALITY,DEFAULT_PITCH|FF_DONTCARE,GlobalText[0][0] ? GlobalText[0] : NULL);
-	g_hFontBold = CreateFont(iFontSize,0,0,0,FW_BOLD,0,0,0,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,NONANTIALIASED_QUALITY,DEFAULT_PITCH|FF_DONTCARE,GlobalText[0][0] ? GlobalText[0] : NULL);
-	g_hFontBig	= CreateFont(iFontSize*2,0,0,0,FW_BOLD,0,0,0,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,NONANTIALIASED_QUALITY,DEFAULT_PITCH|FF_DONTCARE,GlobalText[0][0] ? GlobalText[0] : NULL);
-	g_hFixFont	= CreateFont(nFixFontSize,0,0,0,FW_NORMAL,0,0,0,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,NONANTIALIASED_QUALITY,DEFAULT_PITCH | FF_DONTCARE,GlobalText[18][0] ? GlobalText[18] : NULL);
+
+	g_hFont = CreateFont(iFontSize, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, NONANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Tahoma");
+	g_hFontBold = CreateFont(iFontSize, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, NONANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Tahoma");
+	g_hFontBig = CreateFont(iFontSize * 2, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, NONANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Tahoma");
+	g_hFixFont = CreateFont(nFixFontSize, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, NONANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Tahoma");
+
+	//g_hFont		= CreateFont(iFontSize,0,0,0,FW_NORMAL,0,0,0,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,NONANTIALIASED_QUALITY,DEFAULT_PITCH|FF_DONTCARE,GlobalText[0][0] ? GlobalText[0] : NULL); //Gulim
+	//g_hFontBold = CreateFont(iFontSize,0,0,0,FW_BOLD,0,0,0,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,NONANTIALIASED_QUALITY,DEFAULT_PITCH|FF_DONTCARE,GlobalText[0][0] ? GlobalText[0] : NULL);
+	//g_hFontBig	= CreateFont(iFontSize*2,0,0,0,FW_BOLD,0,0,0,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,NONANTIALIASED_QUALITY,DEFAULT_PITCH|FF_DONTCARE,GlobalText[0][0] ? GlobalText[0] : NULL);
+	//g_hFixFont	= CreateFont(nFixFontSize,0,0,0,FW_NORMAL,0,0,0,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,NONANTIALIASED_QUALITY,DEFAULT_PITCH | FF_DONTCARE,GlobalText[18][0] ? GlobalText[18] : NULL);
 
 	setlocale( LC_ALL, "english");
 

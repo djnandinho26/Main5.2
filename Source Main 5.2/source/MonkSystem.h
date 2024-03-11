@@ -138,6 +138,7 @@ public:
 	int ModifyTypeCommonItemMonk(int _OrginalType);
 	bool IsRagefighterCommonWeapon(BYTE _Class, int _Type);
 	bool IsSwordformGloves(int _Type);
+	void RenderPhoenixGloves(CHARACTER* _pCha, BYTE slot = 0);
 	void RenderSwordformGloves(CHARACTER *_pCha, int _ModelType, int _Hand, float _Alpha, bool _Translate=false, int _Select=0);
 	int ModifyTypeSwordformGloves(int _ModelType, int _LeftHand);
 	int EqualItemModelType(int _Type);

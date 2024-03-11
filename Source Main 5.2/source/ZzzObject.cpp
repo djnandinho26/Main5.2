@@ -827,6 +827,8 @@ void Draw_RenderObject(OBJECT *o,bool Translate,int Select, int ExtraMon)
 
 				b->RenderMesh ( 0, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV );
 				b->RenderMesh ( 1, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV );
+				b->RenderMesh ( 1, RENDER_TEXTURE | RENDER_BRIGHT | RENDER_CHROME, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV );
+
 				if(o->CurrentAction == FENRIR_ATTACK_SKILL)
 				{
 					b->BodyLight[0] = 1.0f;
@@ -3488,7 +3490,7 @@ void RenderObjects()
 									int Level;
 									if ( gCharacterManager.GetBaseClass(Hero->Class)==CLASS_DARK || gCharacterManager.GetBaseClass(Hero->Class)==CLASS_DARK_LORD 
 #ifdef PBG_ADD_NEWCHAR_MONK
-										|| GetBaseClass(Hero->Class)==CLASS_RAGEFIGHTER
+										|| gCharacterManager.GetBaseClass(Hero->Class)==CLASS_RAGEFIGHTER
 #endif //PBG_ADD_NEWCHAR_MONK
 										)
 										Level = 50*2/3;
@@ -3694,7 +3696,7 @@ void RenderObjects_AfterCharacter()
 
 									if ( gCharacterManager.GetBaseClass(Hero->Class)==CLASS_DARK || gCharacterManager.GetBaseClass(Hero->Class)==CLASS_DARK_LORD 
 #ifdef PBG_ADD_NEWCHAR_MONK
-										|| GetBaseClass(Hero->Class)==CLASS_RAGEFIGHTER
+										|| gCharacterManager.GetBaseClass(Hero->Class)==CLASS_RAGEFIGHTER
 #endif //PBG_ADD_NEWCHAR_MONK
 										)
 										Level = 80*2/3;
@@ -5434,6 +5436,42 @@ void ItemObjectAttribute(OBJECT *o)
 	}
 }
 
+
+bool ItemAngleRF(OBJECT* o)
+{
+
+#ifdef PBG_ADD_NEWCHAR_MONK_ITEM
+	if (o->Type == MODEL_WING + 49)
+	{
+		o->Angle[0] = 270.0f;
+		o->Angle[1] = 180.0f;
+		o->Angle[2] = 45.0f;
+		o->Scale = 0.7f;
+	}
+	else if (o->Type == MODEL_WING + 50)
+	{
+		o->Angle[0] = 250.0f;
+		o->Angle[1] = 180.0f;
+		o->Angle[2] = 45.0f;
+	}
+	else if (o->Type >= MODEL_HELM + 59 && o->Type <= MODEL_HELM + 59 + 2)
+	{
+		o->Scale = 1.0f;
+		o->Angle[2] = 45.0f;
+	}
+	else if(o->Type>=MODEL_ETC+30 && o->Type<=MODEL_ETC+36)
+	{
+		o->Angle[0] = 270.f;
+		o->Scale = 0.8f;
+	}
+	else {
+		return false;
+	}
+	return true;
+#endif //PBG_ADD_NEWCHAR_MONK_ITEM
+	return false;
+}
+
 void ItemAngle(OBJECT *o)
 {
 	Vector(0.f,0.f,-45.f,o->Angle);
@@ -5494,22 +5532,6 @@ void ItemAngle(OBJECT *o)
 		o->Angle[0] = 0.f;
 		o->Scale = 0.6f;
 	}
-#ifdef PBG_ADD_NEWCHAR_MONK_ITEM
-	else if(o->Type == MODEL_WING+49)
-	{
-		o->Angle[0] = 270.0f;
-		o->Angle[1] = 180.0f;
-		o->Angle[2] = 45.0f;
-        o->Scale    = 0.7f;
-    }
-	else if(o->Type == MODEL_WING+50)
-	{
-		o->Angle[0] = 250.0f;
-		o->Angle[1] = 180.0f;
-		o->Angle[2] = 45.0f;
-	}
-#endif //PBG_ADD_NEWCHAR_MONK_ITEM
-
 	else if ( o->Type==MODEL_POTION+45)
 	{
 		o->Scale = 0.9f;
@@ -5631,7 +5653,6 @@ void ItemAngle(OBJECT *o)
 		o->Scale = 0.5f;
 		o->Angle[0] = 90.f;
 	}
-
 	else if(o->Type == MODEL_POTION+91)
 	{
 		o->Scale = 0.5f;
@@ -6065,18 +6086,6 @@ void ItemAngle(OBJECT *o)
 		o->Scale = 0.4f;
 		o->Angle[0] = 30.f;
 	}
-#ifdef PBG_ADD_NEWCHAR_MONK_ITEM
-	else if(o->Type >= MODEL_HELM+59 && o->Type <= MODEL_HELM+59+2)
-	{
-		o->Scale = 1.0f;
-		o->Angle[2] = 45.0f;
-	}
-	else if(o->Type>=MODEL_ETC+30 && o->Type<=MODEL_ETC+36)
-	{
-		o->Angle[0] = 270.f;
-		o->Scale = 0.8f;
-	}
-#endif //PBG_ADD_NEWCHAR_MONK_ITEM
 	else if(o->Type>=MODEL_WING && o->Type<MODEL_WING+MAX_ITEM_INDEX)
 	{
 		{
@@ -6102,7 +6111,7 @@ void ItemAngle(OBJECT *o)
 		o->Angle[2] = 45.0f;
 	}
 #endif // LEM_ADD_LUCKYITEM
-	else
+	else if (!ItemAngleRF(o))
 	{
 		o->Angle[0] = 0.f;
 	}
@@ -6649,12 +6658,16 @@ void PartObjectColor(int Type,float Alpha,float Bright,vec3_t Light,bool ExtraMo
 		Color = 42;
 	else if(g_CMonkSystem.EqualItemModelType(Type) == MODEL_SWORD+34)
 		Color = 18;
+	else if(g_CMonkSystem.EqualItemModelType(Type) == MODEL_SWORD+35)
+		Color = 45;
 	else if(Type == MODEL_ARMORINVEN_60)
 		Color = 16;
 	else if(Type == MODEL_ARMORINVEN_61)
 		Color = 42;
 	else if(Type == MODEL_ARMORINVEN_62)
 		Color = 18;
+	else if(Type == MODEL_ARMORINVEN_74)
+		Color = 45;
 #endif //PBG_ADD_NEWCHAR_MONK_ITEM
 	else//  if ( Type<MODEL_WING )
 	{
@@ -6714,6 +6727,7 @@ void PartObjectColor(int Type,float Alpha,float Bright,vec3_t Light,bool ExtraMo
 			case 59:Color=16;break;
 			case 60:Color=42;break;
 			case 61:Color=18;break;
+			case 73:Color=45;break;
 #endif //PBG_ADD_NEWCHAR_MONK_ITEM
 			}
 		}
@@ -6765,6 +6779,8 @@ void PartObjectColor(int Type,float Alpha,float Bright,vec3_t Light,bool ExtraMo
 	case 41:Vector(Bright*0.7f,Bright*0.2f,Bright*0.7f,Light);break;
 	case 42:Vector(Bright*0.8f,Bright*0.4f,Bright*0.0f,Light);break;
 	case 43:Vector(Bright*0.8f,Bright*0.6f,Bright*0.2f,Light);break;
+	case 44:Vector(Bright*0.8f,Bright*0.7f,Bright*0.4f,Light); break;
+	case 45:Vector(Bright*0.5f,Bright*0.8f,Bright*0.9f,Light);break;
 	}
 }
 
@@ -7790,7 +7806,6 @@ void RenderPartObjectBody(BMD *b,OBJECT *o,int Type,float Alpha,int RenderType)
 	{
 		bIsNotRendered = TRUE;
 	}
-
 	if (bIsNotRendered == FALSE);
 	else if ( Type==MODEL_ARMOR+50 || Type==MODEL_PANTS+50 || Type==MODEL_ARMOR+53 || Type==MODEL_PANTS+53)
 	{
@@ -8737,25 +8752,7 @@ void RenderPartObjectBody(BMD *b,OBJECT *o,int Type,float Alpha,int RenderType)
 		b->RenderBody(RENDER_TEXTURE,o->Alpha,o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU,o->BlendMeshTexCoordV,o->HiddenMesh);
 		b->RenderBody(RENDER_BRIGHT|RENDER_CHROME,0.5f,0, o->BlendMeshLight, o->BlendMeshTexCoordU,o->BlendMeshTexCoordV,o->HiddenMesh);
 	}
-	else if(o->Type == MODEL_15GRADE_ARMOR_OBJ_ARMLEFT ||
-			o->Type == MODEL_15GRADE_ARMOR_OBJ_ARMRIGHT ||
-			o->Type == MODEL_15GRADE_ARMOR_OBJ_BODYLEFT ||
-			o->Type == MODEL_15GRADE_ARMOR_OBJ_BODYRIGHT ||
-			o->Type == MODEL_15GRADE_ARMOR_OBJ_BOOTLEFT ||
-			o->Type == MODEL_15GRADE_ARMOR_OBJ_BOOTRIGHT ||
-			o->Type == MODEL_15GRADE_ARMOR_OBJ_HEAD ||
-			o->Type == MODEL_15GRADE_ARMOR_OBJ_PANTLEFT ||
-			o->Type == MODEL_15GRADE_ARMOR_OBJ_PANTRIGHT )
-	{
-		float fLight,texCoordU;
-
-		fLight = 0.8f - absf( sinf ( WorldTime*0.0018f ) * 0.5f);
-		b->RenderMesh(0,RENDER_TEXTURE|RENDER_BRIGHT,o->Alpha,0,fLight-0.1f,o->BlendMeshTexCoordU,o->BlendMeshTexCoordV);
-		texCoordU = absf( sinf ( WorldTime*0.0005f ));
-		b->RenderMesh(0,RENDER_TEXTURE|RENDER_BRIGHT,o->Alpha,0,fLight-0.3f,texCoordU,o->BlendMeshTexCoordV,BITMAP_RGB_MIX);		
- 		b->RenderMesh(0,RENDER_TEXTURE|RENDER_CHROME4,o->Alpha,0,o->BlendMeshLight,o->BlendMeshTexCoordU,o->BlendMeshTexCoordV);
-	}
-
+	
 #ifdef LJH_ADD_ITEMS_EQUIPPED_FROM_INVENTORY_SYSTEM
 	else if( Type == MODEL_HELPER+128 || Type == MODEL_HELPER+129 )
 	{
@@ -8798,6 +8795,77 @@ void RenderPartObjectBody(BMD *b,OBJECT *o,int Type,float Alpha,int RenderType)
 	}
 #endif //LJH_ADD_ITEMS_EQUIPPED_FROM_INVENTORY_SYSTEM_PART_2
 #ifdef PBG_ADD_NEWCHAR_MONK_ITEM
+	else if(g_CMonkSystem.EqualItemModelType(Type) == MODEL_SWORD+35) //ok 
+	{
+		float fLumi = (sinf(WorldTime * 0.003) + 1.f) * 0.3f + 0.4f;
+		b->RenderBody(RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+		b->RenderMesh(0, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+		b->RenderMesh(0, RENDER_BRIGHT, o->Alpha * fLumi, 0, o->BlendMeshLight * fLumi, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV, BITMAP_PHOENIXSOULWING);
+
+		Vector(.15f, 1.f, .25f, b->BodyLight);
+		glColor3fv(b->BodyLight);
+		b->RenderMesh(1, RENDER_TEXTURE|RENDER_BRIGHT, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+		Vector(1.f, 1.f, 1.f, b->BodyLight);
+		b->RenderMesh(1, RENDER_BRIGHT|RENDER_CHROME3, o->Alpha, 1, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+		Vector(1.f, 1.f, 1.f, b->BodyLight);
+	}
+	else if (Type == MODEL_SWORD_35_WING)
+	{
+		float fLumi = (sinf(WorldTime * 0.003) + 1.f) * 0.3f + 0.4f;
+		b->RenderBody(RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+		b->RenderMesh(0, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+		b->RenderMesh(0, RENDER_BRIGHT, o->Alpha * fLumi, 0, o->BlendMeshLight * fLumi, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV, BITMAP_PHOENIXSOULWING);
+
+		Vector(.15f, 1.f, .25f, b->BodyLight);
+		glColor3fv(b->BodyLight);
+		b->RenderMesh(1, RENDER_TEXTURE|RENDER_BRIGHT, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+		Vector(1.f, 1.f, 1.f, b->BodyLight);
+		b->RenderMesh(1, RENDER_CHROME3|RENDER_BRIGHT, o->Alpha, 1, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+		Vector(1.f, 1.f, 1.f, b->BodyLight);
+	}
+	else if (Type == MODEL_HELM+73)
+	{
+		float fLumi = (sinf(WorldTime * 0.003) + 1.f) * 0.3f + 0.4f;
+		if (b->HideSkin == true)
+		{
+			glColor3fv(b->BodyLight);
+			b->RenderMesh(0, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV, -1);
+			b->RenderMesh(2, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV, -1);
+			b->RenderMesh(2, RENDER_CHROME|RENDER_BRIGHT, o->Alpha*fLumi, 2, o->BlendMeshLight*fLumi, (double)(-int(WorldTime) % 1000) * 0.00009f, o->BlendMeshTexCoordV, -1);
+		}
+		else
+		{
+			b->RenderBody(RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+			b->RenderMesh(2, RENDER_CHROME|RENDER_BRIGHT, o->Alpha* fLumi, 2, o->BlendMeshLight* fLumi, (double)(-int(WorldTime) % 1000) * 0.00009f, o->BlendMeshTexCoordV, -1);
+		}
+	}
+	else if (Type == MODEL_ARMOR+73)
+	{
+		float fLumi = (sinf(WorldTime * 0.003) + 1.f) * 0.3f + 0.4f;
+		b->RenderMesh(0, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV, -1);
+		b->RenderMesh(1, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, (double)(-int(WorldTime) % 1000) * 0.00009f, -1);
+		b->RenderMesh(1, RENDER_CHROME|RENDER_BRIGHT, o->Alpha * fLumi, 1, o->BlendMeshLight * fLumi, (double)(-int(WorldTime) % 1000) * 0.00009f, o->BlendMeshTexCoordV, -1);
+		b->RenderMesh(2, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV, -1);
+	}
+	else if (Type == MODEL_ARMORINVEN_74)
+	{
+		vec3_t Light;
+		VectorCopy(b->BodyLight, Light);
+		glColor3fv(b->BodyLight);
+		float fLumi = (sinf(WorldTime * 0.003) + 1.f) * 0.3f + 0.4f;
+		b->RenderMesh(0, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV, -1);
+		b->RenderMesh(1, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, (double)(-int(WorldTime) % 1000) * 0.00009f, o->BlendMeshTexCoordV, -1);
+		b->RenderMesh(1, RENDER_CHROME|RENDER_BRIGHT, o->Alpha * fLumi, o->BlendMesh, o->BlendMeshLight * fLumi, (double)(-int(WorldTime) % 1000) * 0.00009f, o->BlendMeshTexCoordV, -1);
+		VectorCopy(Light, b->BodyLight);
+	}
+	else if (Type == MODEL_BOOTS+73)
+	{
+		glColor3fv(b->BodyLight);
+		float fLumi = (sinf(WorldTime * 0.003) + 1.f) * 0.3f + 0.4f;
+		b->RenderMesh(0, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV, -1);
+		b->RenderMesh(1, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, (double)(-int(WorldTime) % 1000) * 0.00009f, o->BlendMeshTexCoordV, -1);
+		b->RenderMesh(1, RENDER_CHROME|RENDER_BRIGHT, o->Alpha * fLumi, 1, o->BlendMeshLight * fLumi, (double)(-int(WorldTime) % 1000) * 0.00009f, o->BlendMeshTexCoordV, -1);
+	}
 	else if(Type == MODEL_WING+49 || Type == MODEL_WING+135)
 	{
 		b->RenderBody(RenderType,Alpha,o->BlendMesh,o->BlendMeshLight,o->BlendMeshTexCoordU,o->BlendMeshTexCoordV);
@@ -8839,7 +8907,8 @@ void RenderPartObjectBody(BMD *b,OBJECT *o,int Type,float Alpha,int RenderType)
 	}
 	else if((g_CMonkSystem.EqualItemModelType(Type) == MODEL_SWORD+32)
 		|| (g_CMonkSystem.EqualItemModelType(Type) == MODEL_SWORD+33)
-		|| (g_CMonkSystem.EqualItemModelType(Type) == MODEL_SWORD+34))
+		|| (g_CMonkSystem.EqualItemModelType(Type) == MODEL_SWORD+34)
+		|| (g_CMonkSystem.EqualItemModelType(Type) == MODEL_SWORD+35))
 	{
 		b->RenderBody(RENDER_TEXTURE,o->Alpha,o->BlendMesh,o->BlendMeshLight,o->BlendMeshTexCoordU,o->BlendMeshTexCoordV,o->HiddenMesh);
 	}
@@ -9041,7 +9110,7 @@ void RenderPartObjectBodyColor(BMD *b,OBJECT *o,int Type,float Alpha,int RenderT
 		b->RenderMesh( 0, RenderType, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV );
 	}
 #ifdef PBG_ADD_NEWCHAR_MONK_ITEM
-	else if(Type >= MODEL_SWORD+32 && Type <= MODEL_SWORD+34)
+	else if(Type >= MODEL_SWORD+32 && Type <= MODEL_SWORD+35)
 	{
 		b->RenderBody(RenderType,Alpha,o->BlendMesh,o->BlendMeshLight,o->BlendMeshTexCoordU,o->BlendMeshTexCoordV);
 	}
@@ -9064,6 +9133,27 @@ void RenderPartObjectBodyColor(BMD *b,OBJECT *o,int Type,float Alpha,int RenderT
 		b->RenderMesh(1, RenderType, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
 	}
 	else if(Type == MODEL_ARMOR+61)
+	{
+		b->RenderMesh(0, RenderType, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+	}
+	else if(Type == MODEL_HELM+73)
+	{
+		b->RenderMesh(0, RenderType, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+	}
+	else if(Type == MODEL_ARMOR+73)
+	{
+		b->RenderMesh(2, RenderType, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+	}
+	else if(Type == MODEL_ARMORINVEN_74)
+	{
+		if (RenderType&RENDER_METAL)
+		{
+			b->RenderMesh(0, RenderType, Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+			b->RenderMesh(0, RenderType, Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+		}
+		b->RenderMesh(0, RenderType, Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+	}
+	else if (Type == MODEL_BOOTS+73)
 	{
 		b->RenderMesh(0, RenderType, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
 	}
@@ -9136,7 +9226,7 @@ void RenderPartObjectBodyColor2(BMD *b,OBJECT *o,int Type,float Alpha,int Render
 		b->RenderMesh(2,RenderType,o->Alpha,o->BlendMesh,o->BlendMeshLight,o->BlendMeshTexCoordU,o->BlendMeshTexCoordV);
 	}
 #ifdef PBG_ADD_NEWCHAR_MONK_ITEM
-	else if(Type >= MODEL_SWORD+32 && Type <= MODEL_SWORD+34)
+	else if(Type >= MODEL_SWORD+32 && Type <= MODEL_SWORD+35)
 	{
 		b->RenderBody(RenderType,Alpha,o->BlendMesh,o->BlendMeshLight,o->BlendMeshTexCoordU,o->BlendMeshTexCoordV);
 	}
@@ -9159,6 +9249,22 @@ void RenderPartObjectBodyColor2(BMD *b,OBJECT *o,int Type,float Alpha,int Render
 		b->RenderMesh(1, RenderType, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
 	}
 	else if(Type == MODEL_ARMOR+61)
+	{
+		b->RenderMesh(0, RenderType, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+	}
+	else if (Type == MODEL_HELM+73)
+	{
+		b->RenderMesh(0, RenderType, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+	}
+	else if (Type == MODEL_ARMOR+73)
+	{
+		b->RenderMesh(2, RenderType, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+	}
+	else if (Type == MODEL_ARMORINVEN_74)
+	{
+		b->RenderMesh(0, RenderType, Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+	}
+	else if (Type == MODEL_BOOTS+73)
 	{
 		b->RenderMesh(0, RenderType, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
 	}
@@ -9235,92 +9341,9 @@ void NextGradeObjectRender(CHARACTER *c)
 
 	} //for
 
-	int bornIndex[2]; // left, right;
-	int gradeType[2]; // left, right;
-	
-	for(int k=0; k<MAX_BODYPART; k++)
-	{
-		w = &c->BodyPart[k];
-		Level = w->Level;
-		
-		if( k == 0 ) continue;
-		if( Level < 15 || w->Type == -1) continue;
-
-		switch( k )
-		{
-		case 1:
-			{
-				bornIndex[0] = 20;
-				bornIndex[1] = -1;
-				gradeType[0] = MODEL_15GRADE_ARMOR_OBJ_HEAD;
-				gradeType[1] = -1;
-			}break;
-		case 2:
-			{
-				bornIndex[0] = 35;
-				bornIndex[1] = 26;
-				gradeType[0] = MODEL_15GRADE_ARMOR_OBJ_BODYLEFT;
-				gradeType[1] = MODEL_15GRADE_ARMOR_OBJ_BODYRIGHT;
-			}break;
-		case 3:
-			{
-				bornIndex[0] = 3;
-				bornIndex[1] = 10;
-				gradeType[0] = MODEL_15GRADE_ARMOR_OBJ_PANTLEFT;
-				gradeType[1] = MODEL_15GRADE_ARMOR_OBJ_PANTRIGHT;
-			}break;
-		case 4:
-			{
-				bornIndex[0] = 36;
-				bornIndex[1] = 27;
-				gradeType[0] = MODEL_15GRADE_ARMOR_OBJ_ARMLEFT;
-				gradeType[1] = MODEL_15GRADE_ARMOR_OBJ_ARMRIGHT;
-			}break;
-		case 5:
-			{
-				bornIndex[0] = 4;
-				bornIndex[1] = 11;
-				gradeType[0] = MODEL_15GRADE_ARMOR_OBJ_BOOTLEFT;
-				gradeType[1] = MODEL_15GRADE_ARMOR_OBJ_BOOTRIGHT;
-			}break;
-		default:
-			bornIndex[0] = -1;
-			bornIndex[1] = -1;
-			gradeType[0] = -1;
-			gradeType[1] = -1;
-			break;
-		}
-
-		OBJECT *o = &c->Object;
-
-		for(int m=0; m<2; m++)
-		{
-			if(gradeType[m] == -1) continue;
-			
-			switch(Level)
-			{
-			case 15: // +15
-				{
-					w->LinkBone = bornIndex[m];
-					RenderLinkObject(0.f, 0.f, 0.f, c, w, gradeType[m], 0, 0, true, true);
-
-					b->TransformByBoneMatrix(vPos, BoneTransform[0], o->Position);
-					
-					fLight2 = absf( sinf ( WorldTime*0.01f ));
-					Vector(0.2f*fLight2, 0.4f*fLight2, 1.0f*fLight2, vLight);
-					CreateSprite(BITMAP_MAGIC, vPos, 0.12f, vLight, o);
-					
-					Vector(0.4f, 0.7f, 1.0f, vLight);
-					CreateSprite(BITMAP_SHINY+5, vPos, 0.4f, vLight, o);
-
-					Vector(0.1f, 0.3f, 1.0f, vLight);
-					CreateSprite(BITMAP_PIN_LIGHT, vPos, 0.6f, vLight, o, 90.0f);
-				}break;
-			}
-		}
-
-	} //for
-}
+	int bornIndex[2]{}; // left, right;
+	int gradeType[2]{}; // left, right;
+	}
 
 extern float g_Luminosity;
 
@@ -10319,6 +10342,22 @@ void RenderPartObjectEffect(OBJECT *o,int Type,vec3_t Light,float Alpha,int Item
 					b->RenderMesh(1, RENDER_TEXTURE|RENDER_BRIGHT, Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
 				}
 				else if(Type == MODEL_ARMOR+61)
+				{
+					b->RenderMesh(0, RENDER_TEXTURE|RENDER_BRIGHT, Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+				}
+				else if (Type == MODEL_HELM+73)
+				{
+					b->RenderMesh(0, RENDER_TEXTURE|RENDER_BRIGHT, Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+				}
+				else if (Type == MODEL_ARMOR+73)
+				{
+					b->RenderMesh(2, RENDER_TEXTURE|RENDER_BRIGHT, Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+				}
+				else if (Type == MODEL_ARMORINVEN_74)
+				{
+					b->RenderMesh(0, RENDER_TEXTURE|RENDER_BRIGHT, Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
+				}
+				else if (Type == MODEL_BOOTS+73)
 				{
 					b->RenderMesh(0, RENDER_TEXTURE|RENDER_BRIGHT, Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
 				}

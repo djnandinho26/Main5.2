@@ -16,68 +16,74 @@
 
 PARTICLE  Pointers	[MAX_POINTERS];
 
-void CreatePointer(int Type,vec3_t Position,float Angle,vec3_t Light,float Scale)
+void CreatePointer(int Type, vec3_t Position, float Angle, vec3_t Light, float Scale)
 {
 	PARTICLE* Select = NULL;
 	int MinLifeTime = 9999;
-	for(int i=0;i<MAX_POINTERS;i++)
+	for (int i = 0; i < MAX_POINTERS; i++)
 	{
-		PARTICLE *o = &Pointers[i];
-		if(!o->Live)
+		PARTICLE* o = &Pointers[i];
+		if (!o->Live)
 		{
 			o->Live = true;
 			o->Type = Type;
-			VectorCopy(Position,o->Position);
-			VectorCopy(Light,o->Light);
+			VectorCopy(Position, o->Position);
+			VectorCopy(Light, o->Light);
 			o->Angle[2] = Angle;
 			o->Alpha = 1.f;
 			o->Scale = Scale;
-			switch(Type)
+			switch (Type)
 			{
 			case BITMAP_BLOOD:
-			case BITMAP_BLOOD+1:
+			case BITMAP_BLOOD + 1:
 			case BITMAP_FOOT:
-				o->LifeTime = 50+rand()%32;
+				o->LifeTime = 50 + rand() % 32;
+				break;
+			default:
+				o->LifeTime = 0;
 				break;
 			}
 			return;
 		}
 		else
 		{
-			if(MinLifeTime > o->LifeTime)
+			if (MinLifeTime > o->LifeTime)
 			{
 				MinLifeTime = o->LifeTime;
 				Select = o;
 			}
 		}
 	}
-	Select->Live = false;
+	if (Select != NULL)
+	{
+		Select->Live = false;
+	}
 }
 
 void MovePointers()
 {
-	for(int i=0;i<MAX_POINTERS;i++)
+	for (int i = 0; i < MAX_POINTERS; i++)
 	{
-		PARTICLE *o = &Pointers[i];
-		if(o->Live)
+		PARTICLE* o = &Pointers[i];
+		if (o->Live)
 		{
 			o->LifeTime--;
-			switch(o->Type)
+			switch (o->Type)
 			{
-			case BITMAP_CURSOR+5:
+			case BITMAP_CURSOR + 5:
 				o->Scale -= 0.05f;
-				if(o->Scale < 0.1f) o->Live = false;
+				if (o->Scale < 0.1f) o->Live = false;
 				break;
 			case BITMAP_BLOOD:
-			case BITMAP_BLOOD+1:
+			case BITMAP_BLOOD + 1:
 			case BITMAP_FOOT:
-				if(o->Type==BITMAP_BLOOD)
+				if (o->Type == BITMAP_BLOOD)
 				{
 					o->Scale += 0.004f;
 				}
-      			Vector(0.1f,0.f,0.f,o->Light);
-				if(o->LifeTime <= 0) o->Live = false;
-				if(o->LifeTime < 50) o->Alpha = o->LifeTime*0.02f;
+				Vector(1.0f, 2.0f, 3.0f, o->Light);
+				if (o->LifeTime <= 0) o->Live = false;
+				if (o->LifeTime < 50) o->Alpha = o->LifeTime * 0.02f;
 				break;
 			}
 		}
@@ -87,16 +93,17 @@ void MovePointers()
 void RenderPointers()
 {
 	EnableAlphaBlend();
-	for(int i=0;i<MAX_POINTERS;i++)
+	for (int i = 0; i < MAX_POINTERS; i++)
 	{
-		PARTICLE *o = &Pointers[i];
-		if(o->Live)
+		PARTICLE* o = &Pointers[i];
+		if (o->Live)
 		{
-			if(Bitmaps[o->Type].Components==3)
+			if (Bitmaps[o->Type].Components == 3)
 				EnableAlphaBlend();
 			else
 				EnableAlphaTest();
-			RenderTerrainAlphaBitmap(o->Type,o->Position[0],o->Position[1],o->Scale,o->Scale,o->Light,-o->Angle[2],o->Alpha);
+			RenderTerrainAlphaBitmap(o->Type, o->Position[0], o->Position[1], o->Scale, o->Scale, o->Light, -o->Angle[2], o->Alpha);
 		}
 	}
+	DisableAlphaBlend(); // desabilitar alpha blend ao final da função
 }

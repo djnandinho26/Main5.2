@@ -104,8 +104,7 @@ bool EnableEdit    = false;
 
 int g_iLengthAuthorityCode = 20;
 
-char *szServerIpAddress = "192.168.0.104";
-//char *szServerIpAddress = "210.181.89.215";
+char *szServerIpAddress = "IP";
 WORD g_ServerPort = 44405;
 
 #ifdef MOVIE_DIRECTSHOW
@@ -1531,6 +1530,11 @@ void LoadingScene(HDC hDC)
 
 float CameraDistanceTarget = 1000.f;
 float CameraDistance = CameraDistanceTarget;
+bool	Camera3D = true;
+float	Camera3DFov = 0.f;
+vec3_t  Camera3DAngle = { 0, 0, 0 };
+bool	Camera3DRoll = false;
+POINT	Camera3DMouse = { 0, 0 };
 
 bool MoveMainCamera()
 {
@@ -1852,6 +1856,33 @@ bool MoveMainCamera()
             }
         }
     }
+
+	if (SceneFlag == MAIN_SCENE)
+	{
+		if (MouseWheel)
+		{
+			Camera3DFov += MouseWheel;
+			MouseWheel = 0;
+		}
+		CameraFOV += Camera3DFov;
+
+		if (Camera3DRoll)
+		{
+			if (SEASON3B::IsNone(VK_RBUTTON))
+			if (SEASON3B::IsNone(VK_RBUTTON))
+			{
+				Camera3DRoll = false;
+			}
+		}
+		else if (SEASON3B::IsRepeat(VK_RBUTTON) || SEASON3B::IsPress(VK_RBUTTON))
+		{
+			Camera3DRoll = true;
+			Camera3DMouse.x = MouseX;
+			Camera3DMouse.y = MouseY;
+		}
+	}
+
+
     return bLockCamera;
 }
 
@@ -2433,11 +2464,14 @@ void MainScene(HDC hDC)
 	unicode::_sprintf(szDebugText, "FPS : %.1f Connected: %d", FPS,g_bGameServerConnected);
 	unicode::t_char szMousePos[128];
 	unicode::_sprintf(szMousePos, "MousePos : %d %d %d", MouseX, MouseY, MouseLButtonPush);
+	unicode::t_char szCamera3D[128];
+	unicode::_sprintf(szCamera3D, "Camera3D : %.1f %.1f:%.1f:%.1f", CameraFOV, CameraAngle[0], CameraAngle[1], CameraAngle[2]);
 	g_pRenderText->SetFont(g_hFontBold);
 	g_pRenderText->SetBgColor(0, 0, 0, 100);
 	g_pRenderText->SetTextColor(255, 255, 255, 200);
 	g_pRenderText->RenderText(10, 26, szDebugText);
 	g_pRenderText->RenderText(10, 36, szMousePos);
+	g_pRenderText->RenderText(10, 46, szCamera3D);
 	g_pRenderText->SetFont(g_hFont);
 	EndBitmap();
 #endif // defined(_DEBUG) || defined(LDS_FOR_DEVELOPMENT_TESTMODE) || defined(LDS_UNFIXED_FIXEDFRAME_FORDEBUG)
@@ -2453,7 +2487,8 @@ void MainScene(HDC hDC)
 	if (DifTimer < 40)
 	{
 		int32_t dwMilliseconds = 40 - DifTimer;
-		std::this_thread::sleep_for(std::chrono::milliseconds(dwMilliseconds)); 
+		//std::this_thread::sleep_for(std::chrono::milliseconds(dwMilliseconds)); 
+		Sleep(dwMilliseconds);
 		TimePrior += dwMilliseconds;
 		DifTimer = 40;
 	}

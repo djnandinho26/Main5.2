@@ -44,10 +44,33 @@ void CCallStackDump::CCallStackFrame::GetParameter(DWORD* pBuf, size_t size) {
 CCallStackDump::CCallStackDump() {}
 CCallStackDump::~CCallStackDump() { Clear(); }
 
-void CCallStackDump::Dump(const CONTEXT* pContext) {
+void CCallStackDump::Dump(const CONTEXT* pContext) 
+{
 	Clear();
 	
+#ifdef _WIN64
+	DWORD64* pRbp = (DWORD64*)pContext->Rbp;
+#else //! _WIN64
 	DWORD* pEbp = (DWORD*)pContext->Ebp;
+#endif // _WIN64
+
+#ifdef _WIN64
+	for (int i = 0; i < 64; i++)
+	{
+		CCallStackFrame* pCallStackFrame = new CCallStackFrame;
+		if (!pCallStackFrame->Create(reinterpret_cast<DWORD *>(pRbp)))
+		{
+			delete pCallStackFrame;
+			break;
+		}
+		m_listFrame.push_back(pCallStackFrame);
+
+		if (IsBadReadPtr((DWORD64*)*pRbp, sizeof(DWORD64)))
+			break;
+
+		pRbp = (DWORD64*)*pRbp;
+	}
+#else //! _WIN64
 	for(int i=0; i<64; i++) 
 	{
 		CCallStackFrame* pCallStackFrame = new CCallStackFrame;
@@ -62,7 +85,9 @@ void CCallStackDump::Dump(const CONTEXT* pContext) {
 
 		pEbp = (DWORD*)*pEbp;
 	}
+#endif // _WIN64
 }
+
 void CCallStackDump::Dump() 
 {
 	CONTEXT ct;
@@ -73,6 +98,7 @@ void CCallStackDump::Dump()
 	
 	Dump(&ct);
 }
+
 void CCallStackDump::Clear() 
 {
 	type_framevect::iterator fvi = m_listFrame.begin();
@@ -88,12 +114,14 @@ void* CCallStackDump::GetFrameAddr(int index)
 	if(index >= (int)GetStackDepth()) return NULL;
 		return m_listFrame[index]->GetFrameAddr();
 }
+
 void* CCallStackDump::GetReturnAddr(int index) 
 {
                                                                 
 	if(index >= (int)GetStackDepth()) return NULL;
 		return m_listFrame[index]->GetReturnAddr();
 }
+
 void CCallStackDump::GetParameter(int index, DWORD* pBuf, size_t size) 
 {
 	if(index >=0 && index < (int)GetStackDepth()) {

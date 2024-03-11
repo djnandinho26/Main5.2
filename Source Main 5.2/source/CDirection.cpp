@@ -1,3 +1,7 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// CDirection
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "stdafx.h"
 #include "CComGem.h"
 #include "ZzzOpenglUtil.h"
@@ -21,7 +25,6 @@ CDirection::CDirection()
 
 CDirection::~CDirection()
 {
-
 }
 
 void CDirection::Init()
@@ -30,13 +33,12 @@ void CDirection::Init()
 	Vector(0.0f, 0.0f, 0.0f, m_v1stPosition);
 	Vector(0.0f, 0.0f, 0.0f, m_v2ndPosition);
 	Vector(0.0f, 0.0f, 0.0f, m_vResult);
-
 	m_bStateCheck = true;
 	m_bCameraCheck = false;
 	m_bAction = true;
 	m_bTimeCheck = true;
 	m_bOrderExit = false;
-		
+
 	m_bDownHero = false;
 
 	m_fCount = 0.0f;
@@ -63,11 +65,10 @@ void CDirection::CloseAllWindows()
 
 bool CDirection::IsDirection()
 {
-	if(gMapManager.WorldActive == WD_34CRYWOLF_1ST)
+	if (gMapManager.WorldActive == WD_34CRYWOLF_1ST)
 		return m_CMVP.IsCryWolfDirection();
-	else if(gMapManager.WorldActive == WD_39KANTURU_3RD)
+	else if (gMapManager.WorldActive == WD_39KANTURU_3RD)
 		return m_CKanturu.IsKanturuDirection();
-
 	return false;
 }
 
@@ -79,14 +80,13 @@ void CDirection::CheckDirection()
 
 void CDirection::SetCameraPosition()
 {
-	if(m_bStateCheck)
+	if (m_bStateCheck)
 	{
-		if(m_iTimeSchedule == 0)
+		if (m_iTimeSchedule == 0)
 		{
 			VectorCopy(Hero->Object.Position, m_v1stPosition);
 			m_iTimeSchedule++;
 		}
-		
 		VectorSubtract(m_v2ndPosition, m_v1stPosition, m_vResult);
 		m_fLength = VectorLength(m_vResult);
 	}
@@ -129,13 +129,12 @@ bool CDirection::DirectionCameraMove()
 void CDirection::DeleteMonster()
 {
 	int Count = stl_Monster.size();
-	
-	if(Count == 0)
+	if (Count == 0)
 		return;
 
-	for(int i = 0; i < Count; i++)
+	for (int i = 0; i < Count; i++)
 	{
-		DeleteCharacter(i+NUMOFMON);
+		DeleteCharacter(i + NUMOFMON);
 		stl_Monster.erase(stl_Monster.begin());
 	}
 }
@@ -161,18 +160,18 @@ float CDirection::CalculateAngle(CHARACTER* c, int x, int y, float Angle)
 	return fAngle;
 }
 
-void CDirection::SummonCreateMonster(int Type, int x, int y, float Angle, bool NextCheck, bool SummonAni, float AniSpeed)
+void CDirection::SummonCreateMonster(int Type, int x, int y, float Angle, bool NextCheck, bool SummonAni, float AniSpeed) 
 {
 	CHARACTER* c = NULL;
-	DirectionMonster DMonster = {0,	};
+	DirectionMonster DMonster = { 0 };
 
 	DMonster.m_Index = stl_Monster.size();
-	DMonster.m_bAngleCheck	= true;
+	DMonster.m_bAngleCheck = true;
 	DMonster.m_iActionCheck = 0;
 
 	stl_Monster.push_back(DMonster);
-	
-	c = CreateMonster(Type,x,y,DMonster.m_Index+NUMOFMON);
+
+	c = CreateMonster(Type, x, y, DMonster.m_Index + NUMOFMON);
 	c->Key = NUMOFMON + DMonster.m_Index++;
 	c->Object.Angle[2] = Angle;
 	c->Weapon[0].Type = -1;
@@ -181,36 +180,36 @@ void CDirection::SummonCreateMonster(int Type, int x, int y, float Angle, bool N
 
 	int Index = 0;
 	
-	switch(Type)
+	switch (Type)
 	{
-	case 344: Index = MODEL_MONSTER01+91;	break;
-	case 341: Index = MODEL_MONSTER01+94;	break;
+	case 344: Index = MODEL_MONSTER01 + 91; break;
+	case 341: Index = MODEL_MONSTER01 + 94; break;
 	case 440:
-  	case 340: Index = MODEL_MONSTER01+92;	break;
-	case 345: Index = MODEL_MONSTER01+93;	break;
-	case 348: Index = MODEL_MONSTER01+99;	break;
-	case 349: Index = MODEL_MONSTER01+89;	break;
-	case 361: Index = MODEL_MONSTER01+121;	break;
+	case 340: Index = MODEL_MONSTER01 + 92; break;
+	case 345: Index = MODEL_MONSTER01 + 93; break;
+	case 348: Index = MODEL_MONSTER01 + 99; break;
+	case 349: Index = MODEL_MONSTER01 + 89; break;
+	case 361: Index = MODEL_MONSTER01 + 121; break;
 	}
 	
-  	BMD *b = &Models[Index];
-	
-	if(AniSpeed >= 0.0f)
+	BMD* b = &Models[Index];
+
+	if (AniSpeed >= 0.0f)
 		b->Actions[MONSTER01_WALK].PlaySpeed = AniSpeed;
 
-	if(SummonAni)
+	if (SummonAni)
 	{
-		if(Type == 361)
+		if (Type == 361)
 		{
 			vec3_t Light, Angle;
 
-			Vector ( 0.5f, 0.8f, 1.0f, Light );
+			Vector(0.5f, 0.8f, 1.0f, Light);
 			Vector(0.0f, 0.0f, 0.0f, Angle);
-			CreateEffect(MODEL_STORM2,c->Object.Position, Angle, Light, 1, NULL, -1, 0, 0, 0, 1.6f);
-			CreateEffect(MODEL_STORM2,c->Object.Position, Angle, Light, 1, NULL, -1, 0, 0, 0, 1.3f);
-			CreateEffect(MODEL_STORM2,c->Object.Position, Angle, Light, 1, NULL, -1, 0, 0, 0, 0.7f);
+			CreateEffect(MODEL_STORM2, c->Object.Position, Angle, Light, 1, NULL, -1, 0, 0, 0, 1.6f);
+			CreateEffect(MODEL_STORM2, c->Object.Position, Angle, Light, 1, NULL, -1, 0, 0, 0, 1.3f);
+			CreateEffect(MODEL_STORM2, c->Object.Position, Angle, Light, 1, NULL, -1, 0, 0, 0, 0.7f);
 
-			PlayBuffer ( SOUND_KANTURU_3RD_MAYA_END );
+			PlayBuffer(SOUND_KANTURU_3RD_MAYA_END);
 		}
 		else
 		{
@@ -242,108 +241,111 @@ void CDirection::SummonCreateMonster(int Type, int x, int y, float Angle, bool N
 
 bool CDirection::MoveCreatedMonster(int Index, int x, int y, float Angle, int Speed)
 {
-	CHARACTER *c = NULL;
+	CHARACTER* c = NULL;
 	bool bNext = false;
 
-	for(int i=0;i<MAX_CHARACTERS_CLIENT;i++)
+	for (int i = 0; i < MAX_CHARACTERS_CLIENT; i++)
 	{
-		c = &CharactersClient[i];	
+		c = &CharactersClient[i];
 
-		if(c->Object.Live && c->Key == Index+NUMOFMON)
+		if (c->Object.Live && c->Key == Index + NUMOFMON)
 			break;
 	}
 
-	int PresentX = (int)(c->Object.Position[0])/TERRAIN_SCALE;
-	int PresentY = (int)(c->Object.Position[1])/TERRAIN_SCALE;
+	int PresentX = (int)(c->Object.Position[0]) / TERRAIN_SCALE;
+	int PresentY = (int)(c->Object.Position[1]) / TERRAIN_SCALE;
 
-	if(PresentX == x && PresentY == y) bNext = true;
+	if (PresentX == x && PresentY == y) bNext = true;
 	
-	if(!bNext)
+	if (!bNext)
 	{
 		int iResult = 0;
 
-		if(stl_Monster[Index].m_bAngleCheck)
+		if (stl_Monster[Index].m_bAngleCheck)
 		{
-			int	iAngle1 = (int)CalculateAngle(c, x, y, Angle);
+			int iAngle1 = (int)CalculateAngle(c, x, y, Angle);
 			int iAngle2 = (int)c->Object.Angle[2];
 
-			if((iAngle1 - Angle) > 180)
+			if ((iAngle1 - Angle) > 180)
 				iAngle1 = iAngle1 - 360;
-			
+
 			iResult = iAngle1 - iAngle2;
-			c->Blood  = false;
+			c->Blood = false;
 		}
 
-		if(iResult <= 3 && iResult >= -3)
+		if (iResult <= 3 && iResult >= -3)
 		{
 			c->Blood = true;
 			stl_Monster[Index].m_bAngleCheck = false;
 		}
 
-		if(c->Blood)
+		if (c->Blood)
 		{
 			c->MoveSpeed = Speed;
-			SetAction(&c->Object,MONSTER01_WALK);
+			SetAction(&c->Object, MONSTER01_WALK);
 			MoveCharacterPosition(c);
 		}
 		else
 		{
-			if(iResult > 3 && iResult <= 180)
+			if (iResult > 3 && iResult <= 180)
 				c->Object.Angle[2] += 3.0f;
-			else								
+			else
 				c->Object.Angle[2] -= 3.0f;
 
-			SetAction(&c->Object,MONSTER01_STOP1);
+			SetAction(&c->Object, MONSTER01_STOP1);
 		}
 	}
 	else
 	{
-		c->Object.Position[0] = (float)(x*TERRAIN_SCALE) + 0.5f*TERRAIN_SCALE;
-		c->Object.Position[1] = (float)(y*TERRAIN_SCALE) + 0.5f*TERRAIN_SCALE;
+		c->Object.Position[0] = (float)(x * TERRAIN_SCALE) + 0.5f * TERRAIN_SCALE;
+		c->Object.Position[1] = (float)(y * TERRAIN_SCALE) + 0.5f * TERRAIN_SCALE;
 
 		stl_Monster[Index].m_bAngleCheck = true;
-		SetAction(&c->Object,MONSTER01_STOP1);
+		SetAction(&c->Object, MONSTER01_STOP1);
 		return true;
 	}
 
 	return false;
 }
 
-bool CDirection::ActionCreatedMonster(int Index, int Action, int Count, bool TankerAttack, bool NextCheck)
+bool CDirection::ActionCreatedMonster(int Index, int Action, int Count, bool TankerAttack, bool NextCheck) 
 {
-	CHARACTER *c = NULL;
+	CHARACTER* c = NULL;
 	bool bNext = false;
 
-	for(int i=0;i<MAX_CHARACTERS_CLIENT;i++)
+	for (int i = 0; i < MAX_CHARACTERS_CLIENT; i++)
 	{
-		c = &CharactersClient[i];	
+		c = &CharactersClient[i];
 
-		if(c->Object.Live && c->Key == Index+NUMOFMON) break;
+		if (c->Object.Live && c->Key == Index + NUMOFMON)
+			break;
 	}
 	
-	if( stl_Monster[Index].m_iActionCheck == Count) bNext = true;
+	if (stl_Monster[Index].m_iActionCheck == Count)
+		bNext = true;
 
-	if(!bNext)
+	if (!bNext)
 	{
-		if(c->Object.CurrentAction != Action)
+		if (c->Object.CurrentAction != Action)
 		{
 			c->Object.CurrentAction = Action;
-			c->Object.AnimationFrame = 0.0f;	
+			c->Object.AnimationFrame = 0.0f;
 			stl_Monster[Index].m_iActionCheck++;
 
-			if(TankerAttack)
-				CreateEffect(MODEL_ARROW_TANKER,c->Object.Position,c->Object.Angle,c->Object.Light,1,&c->Object,c->Object.PKKey);
+			if (TankerAttack)
+				CreateEffect(MODEL_ARROW_TANKER, c->Object.Position, c->Object.Angle, c->Object.Light, 1, &c->Object, c->Object.PKKey);
 		}
 	}
 	else
 	{
-		if(NextCheck)
+		if (NextCheck)
 		{
 			stl_Monster[Index].m_iActionCheck = 0;
 			m_iCheckTime++;
 		}
 
-		if(c->Object.AnimationFrame >= 8.0f) return true;
+		if (c->Object.AnimationFrame >= 8.0f)
+			return true;
 	}
 
 	return false;
@@ -351,45 +353,46 @@ bool CDirection::ActionCreatedMonster(int Index, int Action, int Count, bool Tan
 
 void CDirection::HeroFallingDownDirection()
 {
-	if(!m_bDownHero)
+	if (!m_bDownHero)
 		return;
 
-	Hero->Object.Gravity		+= 1.5f;
-	Hero->Object.Angle[0]		-= 2.f;
-	Hero->Object.m_bActionStart	 = true;
-	Hero->Object.Direction[1]	+= Hero->Object.Direction[0];
+	Hero->Object.Gravity += 1.5f;
+	Hero->Object.Angle[0] -= 2.f;
+	Hero->Object.m_bActionStart = true;
+	Hero->Object.Direction[1] += Hero->Object.Direction[0];
 
-	if(Hero->Object.Gravity <= 2.f)
+	if (Hero->Object.Gravity <= 2.f)
 		m_AngleY = Hero->Object.Angle[2];
 
-	if(Hero->Object.Angle[0] <= -90.0f)
+	if (Hero->Object.Angle[0] <= -90.0f)
 		Hero->Object.Angle[0] = -90.0f;
-	
+
 	Hero->Object.Angle[2] = m_AngleY;
 
-	if(Hero->Object.Gravity >= 150.0f)
+	if (Hero->Object.Gravity >= 150.0f)
 		Hero->Object.Gravity = 150.0f;
 
 	Hero->Object.Position[2] -= Hero->Object.Gravity;
 
 	FaillingEffect();
+
 }
 
 void CDirection::FaillingEffect()
 {
 	vec3_t Pos, Light;
-	float Scale = 1.3f + rand()%10/30.0f;
+	float Scale = 1.3f + (rand() % 10) / 30.0f;
 	Vector(0.05f, 0.05f, 0.08f, Light);
 
-	Pos[0] = Hero->Object.Position[0]+(float)(rand()%20-10)*70.0f;
-	Pos[1] = Hero->Object.Position[1]+(float)(rand()%20-10)*70.0f;
-	Pos[2] = Hero->Object.Position[2]-rand()%200-500.0f;
+	Pos[0] = Hero->Object.Position[0] + (float)(rand() % 20 - 10) * 70.0f;
+	Pos[1] = Hero->Object.Position[1] + (float)(rand() % 20 - 10) * 70.0f;
+	Pos[2] = Hero->Object.Position[2] - rand() % 200 - 500.0f;
 
 	CreateParticle(BITMAP_CLOUD, Pos, Hero->Object.Angle, Light, 13, Scale);
 
-	Pos[0] = Hero->Object.Position[0]+(float)(rand()%20-10)*70.0f;
-	Pos[1] = Hero->Object.Position[1]+(float)(rand()%20-10)*70.0f;
-	Pos[2] = Hero->Object.Position[2]-rand()%200-500.0f;
+	Pos[0] = Hero->Object.Position[0] + (float)(rand() % 20 - 10) * 70.0f;
+	Pos[1] = Hero->Object.Position[1] + (float)(rand() % 20 - 10) * 70.0f;
+	Pos[2] = Hero->Object.Position[2] - rand() % 200 - 500.0f;
 
 	Vector(0.05f, 0.05f, 0.05f, Light);
 	CreateParticle(BITMAP_CLOUD, Pos, Hero->Object.Angle, Light, 13, Scale);

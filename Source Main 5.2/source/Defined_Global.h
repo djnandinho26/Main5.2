@@ -3,7 +3,7 @@
 	#define KWAK_FIX_ALT_KEYDOWN_MENU_BLOCK
 #endif // _DEBUG
 
-#define NEW_PROTOCOL_SYSTEM
+//#define NEW_PROTOCOL_SYSTEM
 
 #define PJH_NEW_SERVER_SELECT_MAP
 
@@ -32,9 +32,13 @@
 
 #define PJH_ADD_PANDA_PET
 #define PJH_ADD_PANDA_CHANGERING
+#define PBG_ADD_NEWCHAR_MONK
+#ifdef PBG_ADD_NEWCHAR_MONK
+	#define PBG_ADD_NEWCHAR_MONK_SKILL
+	#define PBG_ADD_NEWCHAR_MONK_ITEM
+	#define PBG_ADD_NEWCHAR_MONK_ANI
+	#define PBG_MOD_NEWCHAR_MONK_WING_2
+	#define PBG_MOD_RAGEFIGHTERSOUND
+#endif
 
-
-
-
-
-
+// #define ADD_MASTERLEVEL_LVL_INFO // Original Master level character info

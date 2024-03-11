@@ -21,26 +21,23 @@ void CCameraMove::Init()
 	m_fCameraStartDistanceLevel = 10.f;
 	m_iDelayCount = 0;
 	m_dwCameraWalkState = CAMERAWALK_STATE_READY;
-
 	m_CurrentCameraPos[0] = m_CurrentCameraPos[1] = m_CurrentCameraPos[2] = 0.0f;
 	m_fCurrentDistanceLevel = 0.f;
 
 	m_dwCurrentIndex = 0;
 	m_iSelectedTile = -1;
 
-	m_bTourMode = FALSE;
-	m_bTourPause = FALSE;
+	m_bTourMode = false;
+	m_bTourPause = false;
 	m_fForceSpeed = 0;
 	m_vTourCameraPos[0] = m_vTourCameraPos[1] = m_vTourCameraPos[2] = 0.0f;
 	m_fTourCameraAngle = 0;
 	m_fTargetTourCameraAngle = 0;
-
 #ifdef PJH_NEW_SERVER_SELECT_MAP
-	m_fCameraAngle =0;
-	m_fFrustumAngle =0;
+	m_fCameraAngle = 0;
+	m_fFrustumAngle = 0;
 #endif //PJH_NEW_SERVER_SELECT_MAP
 }
-
 bool CCameraMove::LoadCameraWalkScript(const std::string& filename)
 {
 	UnLoadCameraWalkScript();

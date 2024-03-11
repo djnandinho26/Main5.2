@@ -173,7 +173,7 @@ bool SEASON3B::CNewUICharacterInfoWindow::BtnProcess()
 	{
 		if(gCharacterManager.IsMasterLevel( Hero->Class ) == true 
 #ifdef PBG_ADD_NEWCHAR_MONK
-			&& GetCharacterClass(Hero->Class) != CLASS_TEMPLENIGHT
+			&& gCharacterManager.GetCharacterClass(Hero->Class) != CLASS_TEMPLENIGHT
 #endif //PBG_ADD_NEWCHAR_MONK
 			)
 			g_pNewUISystem->Toggle(SEASON3B::INTERFACE_MASTER_LEVEL);
@@ -269,7 +269,7 @@ void SEASON3B::CNewUICharacterInfoWindow::RenderSubjectTexts()
 	char strID[256];
 	sprintf(strID, "%s", CharacterAttribute->Name);
 	unicode::t_char strClassName[256];
-	unicode::_sprintf(strClassName, "(%s)", gCharacterManager.GetCharacterClassText(CharacterAttribute->Class));
+	unicode::_sprintf(strClassName, "(%s) %d", gCharacterManager.GetCharacterClassText(CharacterAttribute->Class), CharacterAttribute->Class);
 	
 	g_pRenderText->SetFont(g_hFontBold);
 	g_pRenderText->SetBgColor(20, 20, 20, 20);
@@ -298,13 +298,18 @@ void SEASON3B::CNewUICharacterInfoWindow::RenderTableTexts()
 
 	if(gCharacterManager.IsMasterLevel(CharacterAttribute->Class) == true)
 	{
-		unicode::_sprintf(strLevel, GlobalText[1745]);
-		unicode::_sprintf(strExp, "----------");
+		//Original
+		//unicode::_sprintf(strLevel, GlobalText[1745]);
+		//unicode::_sprintf(strExp, "----------");
+
+		//Reset
+		unicode::_sprintf(strLevel, GlobalText[200], CharacterAttribute->Level); // Level: %d
+		unicode::_sprintf(strExp, GlobalText[201], CharacterAttribute->Experience, CharacterAttribute->NextExperince); // Exp : %u/%u
 	}
 	else
 	{
-		unicode::_sprintf(strLevel, GlobalText[200], CharacterAttribute->Level);
-		unicode::_sprintf(strExp, GlobalText[201], CharacterAttribute->Experience, CharacterAttribute->NextExperince);
+		unicode::_sprintf(strLevel, GlobalText[200], CharacterAttribute->Level); // Level: %d
+		unicode::_sprintf(strExp, GlobalText[201], CharacterAttribute->Experience, CharacterAttribute->NextExperince); // Exp : %u/%u
 	}
 	if(CharacterAttribute->Level > 9)
 	{
@@ -855,7 +860,7 @@ void SEASON3B::CNewUICharacterInfoWindow::RenderAttribute()
 	unicode::t_char strDexterity[32];
 	WORD wDexterity = CharacterAttribute->Dexterity + CharacterAttribute->AddDexterity;
 	unicode::_sprintf(strDexterity, "%d", wDexterity);
-	g_pRenderText->RenderText(m_Pos.x+12, m_Pos.y+HEIGHT_DEXTERITY+6, GlobalText[1702], 74, 0, RT3_SORT_CENTER);
+	g_pRenderText->RenderText(m_Pos.x+12, m_Pos.y+HEIGHT_DEXTERITY+6, GlobalText[167], 74, 0, RT3_SORT_CENTER); // Fix Agility > AGI
 	g_pRenderText->RenderText(m_Pos.x+86, m_Pos.y+HEIGHT_DEXTERITY+6, strDexterity, 86, 0, RT3_SORT_CENTER);
 
 	bool bDexSuccess = true;
@@ -1688,7 +1693,7 @@ void SEASON3B::CNewUICharacterInfoWindow::OpenningProcess()
 
 	if(gCharacterManager.IsMasterLevel(Hero->Class) == true
 #ifdef PBG_ADD_NEWCHAR_MONK
-		&& GetCharacterClass(Hero->Class) != CLASS_TEMPLENIGHT
+		&& gCharacterManager.GetCharacterClass(Hero->Class) != CLASS_TEMPLENIGHT
 #endif //PBG_ADD_NEWCHAR_MONK
 		)
 	{

@@ -383,7 +383,7 @@
 
 #define MAX_MONSTER			1024
 
-#define MAX_SKILLS			600
+#define MAX_SKILLS			650
 
 #define MAX_DUTY_CLASS		3
 

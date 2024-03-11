@@ -311,6 +311,11 @@ void OpenPlayers()
 		gLoadData.AccessModel(MODEL_PANTS +59+i, "Data\\Player\\", "PantMale", 60+i);
 		gLoadData.AccessModel(MODEL_BOOTS +59+i, "Data\\Player\\", "BootMale", 60+i);
 	}
+
+	gLoadData.AccessModel(MODEL_HELM+73, "Data\\Player\\", "HelmMale74", -1);
+	gLoadData.AccessModel(MODEL_ARMOR+73, "Data\\Player\\", "ArmorMale74", -1);
+	gLoadData.AccessModel(MODEL_PANTS+73, "Data\\Player\\", "PantMale74", -1);
+	gLoadData.AccessModel(MODEL_BOOTS+73, "Data\\Player\\", "BootMale74", -1);
 #endif //PBG_ADD_NEWCHAR_MONK_ITEM
 
 	{
@@ -642,6 +647,10 @@ void OpenPlayerTextures()
 		gLoadData.OpenTexture(MODEL_PANTS +59+i, "Player\\");
 		gLoadData.OpenTexture(MODEL_BOOTS +59+i, "Player\\");
 	}
+	gLoadData.OpenTexture(MODEL_HELM+73, "Player\\");
+	gLoadData.OpenTexture(MODEL_ARMOR+73, "Player\\");
+	gLoadData.OpenTexture(MODEL_PANTS+73, "Player\\");
+	gLoadData.OpenTexture(MODEL_BOOTS+73, "Player\\");
 #endif //PBG_ADD_NEWCHAR_MONK_ITEM
 }
 
@@ -1233,15 +1242,15 @@ void OpenItems()
 	gLoadData.AccessModel(MODEL_POTION+143, "Data\\Item\\", "requitalbox_blue");
 	gLoadData.AccessModel(MODEL_POTION+144, "Data\\Item\\", "requitalbox_wood");
 
-	gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_ARMLEFT,	"Data\\Item\\", "class15_armleft");	
-	gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_ARMRIGHT,	"Data\\Item\\", "class15_armright");
-	gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_BODYLEFT,	"Data\\Item\\", "class15_bodyleft");
-	gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_BODYRIGHT,	"Data\\Item\\", "class15_bodyright");
-	gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_BOOTLEFT,	"Data\\Item\\", "class15_bootleft");
-	gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_BOOTRIGHT,	"Data\\Item\\", "class15_bootright");
-	gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_HEAD,		"Data\\Item\\", "class15_head");
-	gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_PANTLEFT,	"Data\\Item\\", "class15_pantleft");
-	gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_PANTRIGHT,	"Data\\Item\\", "class15_pantright");
+	//gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_ARMLEFT,	"Data\\Item\\", "class15_armleft");	    //Efeito +15
+	//gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_ARMRIGHT,	"Data\\Item\\", "class15_armright");    //Efeito +15
+	//gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_BODYLEFT,	"Data\\Item\\", "class15_bodyleft");    //Efeito +15
+	//gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_BODYRIGHT,	"Data\\Item\\", "class15_bodyright");   //Efeito +15
+	//gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_BOOTLEFT,	"Data\\Item\\", "class15_bootleft");    //Efeito +15
+	//gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_BOOTRIGHT,	"Data\\Item\\", "class15_bootright");   //Efeito +15
+	//gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_HEAD,		"Data\\Item\\", "class15_head");        //Efeito +15
+	//gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_PANTLEFT,	"Data\\Item\\", "class15_pantleft");    //Efeito +15
+	//gLoadData.AccessModel(MODEL_15GRADE_ARMOR_OBJ_PANTRIGHT,	"Data\\Item\\", "class15_pantright");   //Efeito +15
 
 #ifdef PBG_ADD_NEWCHAR_MONK_ITEM
 	gLoadData.AccessModel(MODEL_WING+49, "Data\\Item\\", "Wing", 50);
@@ -1791,17 +1800,6 @@ void OpenItemTextures()
 		gLoadData.OpenTexture(MODEL_POTION+141+_index, "Item\\");
 #endif //PBG_ADD_GENSRANKING
 
-	gLoadData.OpenTexture(MODEL_15GRADE_ARMOR_OBJ_ARMLEFT,	"Item\\");		// 14, 15 efeito chifres brancos
-	gLoadData.OpenTexture(MODEL_15GRADE_ARMOR_OBJ_ARMRIGHT,	"Item\\");		// 14, 15
-	gLoadData.OpenTexture(MODEL_15GRADE_ARMOR_OBJ_BODYLEFT,	"Item\\");		// 14, 15
-	gLoadData.OpenTexture(MODEL_15GRADE_ARMOR_OBJ_BODYRIGHT,	"Item\\");	// 14, 15
-	gLoadData.OpenTexture(MODEL_15GRADE_ARMOR_OBJ_BOOTLEFT,	"Item\\");		// 14, 15
-	gLoadData.OpenTexture(MODEL_15GRADE_ARMOR_OBJ_BOOTRIGHT,	"Item\\");	// 14, 15
-	gLoadData.OpenTexture(MODEL_15GRADE_ARMOR_OBJ_HEAD,		"Item\\");		// 14, 15
-	gLoadData.OpenTexture(MODEL_15GRADE_ARMOR_OBJ_PANTLEFT,	"Item\\");		// 14, 15
-	gLoadData.OpenTexture(MODEL_15GRADE_ARMOR_OBJ_PANTRIGHT,	"Item\\");	// 14, 15
-	LoadBitmap("Item\\rgb_mix.jpg"	,BITMAP_RGB_MIX	,GL_LINEAR, GL_REPEAT);
-
 #ifdef PBG_ADD_NEWCHAR_MONK_ITEM
 	gLoadData.OpenTexture(MODEL_WING+49, "Item\\");
 	gLoadData.OpenTexture(MODEL_WING+50, "Item\\");
@@ -1809,6 +1807,8 @@ void OpenItemTextures()
 	g_CMonkSystem.LoadModelItemTexture();
 	for(int _nRollIndex=0; _nRollIndex<7; ++_nRollIndex)
 		gLoadData.OpenTexture(MODEL_ETC+30+_nRollIndex, "Item\\");
+
+	LoadBitmap("Item\\PhoenixSoul_render.JPG", BITMAP_PHOENIXSOULWING, GL_LINEAR, GL_REPEAT);
 #endif //PBG_ADD_NEWCHAR_MONK_ITEM
 
 #ifdef LEM_ADD_LUCKYITEM
@@ -4464,6 +4464,19 @@ void OpenSkills()
 	gLoadData.OpenTexture(MODEL_SHOCKWAVE03, "Effect\\");
 	LoadBitmap("Effect\\ground_smoke.tga", BITMAP_GROUND_SMOKE, GL_LINEAR, GL_CLAMP_TO_EDGE);
 	LoadBitmap("Effect\\knightSt_blue.jpg", BITMAP_KNIGHTST_BLUE, GL_LINEAR, GL_CLAMP_TO_EDGE);
+
+	gLoadData.AccessModel(MODEL_PHOENIX_SHOT, "Data\\Effect\\", "phoenix_shot_effect");
+	gLoadData.OpenTexture(MODEL_PHOENIX_SHOT, "Effect\\");
+	gLoadData.AccessModel(MODEL_WINDSPIN01, "Data\\Effect\\", "wind_spin01");
+	gLoadData.OpenTexture(MODEL_WINDSPIN01, "Effect\\");
+	gLoadData.AccessModel(MODEL_WINDSPIN02, "Data\\Effect\\", "wind_spin02");
+	gLoadData.OpenTexture(MODEL_WINDSPIN02, "Effect\\");
+	gLoadData.AccessModel(MODEL_WINDSPIN03, "Data\\Effect\\", "wind_spin03");
+	gLoadData.OpenTexture(MODEL_WINDSPIN03, "Effect\\");
+
+	gLoadData.AccessModel(MODEL_SWORD_35_WING, "Data\\Item\\", "sword36wing");
+	gLoadData.OpenTexture(MODEL_SWORD_35_WING, "Item\\");
+
 #endif //PBG_ADD_NEWCHAR_MONK_SKILL
 #ifdef ASG_ADD_KARUTAN_MONSTERS
 	// 콘드라 돌조각
@@ -4799,7 +4812,7 @@ void OpenMacro(char *FileName)
 void SaveOptions()
 {
 	// 0 ~ 19 skill hotkey
-	BYTE options[30] = { 0x00, };
+	BYTE options[50] = { 0x00, };
 
 	int iSkillType = -1;
 	for(int i=0; i<10; ++i)

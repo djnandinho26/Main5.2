@@ -1,5 +1,6 @@
 #pragma once
 
+#include "stdafx.h"
 #include "dsplaysound.h"
 #include "zzzscene.h"
 #include "zzzinterface.h"
@@ -382,7 +383,7 @@ __forceinline void SendChat(const char* Text)
 	CStreamPacketEngine spe;
 	spe.Init( 0xC1, 0x00);
 	spe.AddData( Hero->ID, MAX_ID_SIZE);
-	spe.AddData( (void*)Text, (WORD)min( strlen( Text) + 1, MAX_CHAT_SIZE));
+	spe.AddData((void*)Text, (WORD)min(strlen(Text) + 1, MAX_CHAT_SIZE));
 	spe.Send();
 }
 
@@ -506,7 +507,6 @@ extern DWORD g_dwLatestMagicTick;
 		spe.Init( 0xC1, 0x19);\
 		spe << ( BYTE)(HIBYTE(Type))<<( BYTE)(LOBYTE(Type)) << ( BYTE)( ( p_Key)>>8) << ( BYTE)( ( p_Key)&0xff);\
 		spe.Send( TRUE);\
-		hanguo_check3();\
 	}\
 }
 #else //PBG_ADD_NEWCHAR_MONK_SKILL
@@ -2509,7 +2509,6 @@ __forceinline void SendRequestDarkside(WORD nSkill, int Key)
 		spe.Init( 0xC1, 0x4A);\
 		spe << ( BYTE)(HIBYTE(Type))<<( BYTE)(LOBYTE(Type)) << (BYTE)(0) << ( BYTE)( (p_Key)>>8) << ( BYTE)( (p_Key)&0xff);\
 		spe.Send( TRUE);\
-		hanguo_check3();\
 	}\
 }
 

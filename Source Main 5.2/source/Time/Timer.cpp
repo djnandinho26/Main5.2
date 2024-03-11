@@ -5,19 +5,18 @@
 
 CTimer::CTimer()
 {
-	if (::QueryPerformanceFrequency((LARGE_INTEGER*)&m_frequency) == FALSE)
+	if (::QueryPerformanceFrequency(reinterpret_cast<LARGE_INTEGER*>(&m_frequency)) == FALSE)
 	{
 		m_bUsePerformanceCounter = FALSE;
 
 		TIMECAPS Caps;
 		::timeGetDevCaps(&Caps, sizeof(Caps));
-		
+
 		if (::timeBeginPeriod(Caps.wPeriodMin) == TIMERR_NOCANDO)
 		{
 #ifdef __TIMER_DEBUG
 			__TraceF(TEXT("timeBeginPeriod(...) Error\n"));
-			//CDebug::OutputDebugString("timeBeginPeriod(...) Error");
-#endif //__TIMER_DEBUG 
+#endif //__TIMER_DEBUG
 		}
 
 		m_mmAbsTimerStart = m_mmTimerStart = ::timeGetTime();
@@ -26,10 +25,10 @@ CTimer::CTimer()
 	{
 		m_bUsePerformanceCounter = TRUE;
 
-		::QueryPerformanceCounter((LARGE_INTEGER*)&m_pcTimerStart);
+		::QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&m_pcTimerStart));
 
 		m_pcAbsTimerStart = m_pcTimerStart;
-		m_resolution = (float)(1.0 / (double)m_frequency) * 1000.0f;
+		m_resolution = static_cast<float>(1.0 / static_cast<double>(m_frequency)) * 1000.0f;
 	}
 }
 

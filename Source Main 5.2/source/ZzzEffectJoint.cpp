@@ -2706,140 +2706,118 @@ void CreateJoint(int Type,vec3_t Position,vec3_t TargetPosition,vec3_t Angle,int
 	}
 }
 
-void DeleteJoint( int Type, OBJECT *Target, int SubType)
-{
-	for(int i=0;i<MAX_JOINTS;i++)
-	{
-		JOINT *o = &Joints[i];
-		
-		if(Target == NULL)
-		{
-			if(o->Live && o->Type == Type)
-			{
-				if(SubType == -1 || o->SubType == SubType)
-				{
-					o->Live = false;
-				}
+void DeleteJoint(int Type, OBJECT* Target, int SubType) {
+	for (int i = 0; i < MAX_JOINTS; i++) {
+		JOINT* o = &Joints[i];
+		if (Target == NULL) {
+			if (o->Live && o->Type == Type && (SubType == -1 || o->SubType == SubType)) {
+				o->Live = false;
 			}
 		}
-		else if(o->Live && o->Type == Type && o->Target == Target)
-		{
-            if ( SubType==-1 || o->SubType==SubType )
-				o->Live = false;
+		else if (o->Live && o->Type == Type && o->Target == Target && (SubType == -1 || o->SubType == SubType)) {
+			o->Live = false;
 		}
 	}
 }
 
-bool SearchJoint( int Type, OBJECT *Target, int SubType)
-{
-	for(int i=0;i<MAX_JOINTS;i++)
-	{
-		JOINT *o = &Joints[i];
-		if(o->Live && o->Type == Type && o->Target == Target)
-		{
-            if ( SubType==-1 || o->SubType==SubType )
-				return true;
+
+bool SearchJoint(int Type, OBJECT* Target, int SubType) {
+	for (int i = 0; i < MAX_JOINTS; i++) {
+		JOINT* o = &Joints[i];
+		if (o->Live && o->Type == Type && o->Target == Target && (SubType == -1 || o->SubType == SubType)) {
+			return true;
 		}
 	}
-    return false;
+	return false;
 }
 
+void CreateTailAxis(JOINT* o, float Matrix[3][4], BYTE axis) {
+	o->NumTails++;
+	if (o->NumTails > o->MaxTails - 1) {
+		o->NumTails = o->MaxTails - 1;
+	}
+	for (int j = o->NumTails - 1; j >= 0; j--) {
+		for (int k = 0; k < 4; k++) {
+			VectorCopy(o->Tails[j][k], o->Tails[j + 1][k]);
+		}
+	}
 
-void CreateTailAxis(JOINT *o, float Matrix[3][4], BYTE axis)
+	vec3_t Position, p;
+	if (axis == 0) {
+		Vector(-o->Scale * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][0]);
+		Vector(-o->Scale * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][1]);
+		Vector(-o->Scale * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][2]);
+		Vector(-o->Scale * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][3]);
+	}
+	else {
+		Vector(-o->Scale * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][0]);
+		Vector(-o->Scale * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][1]);
+		Vector(-o->Scale * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][2]);
+		Vector(-o->Scale * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][3]);
+	}
+}
+
+void CreateTailAxis(JOINT* o, float Matrix[3][4], float ScaleX, float ScaleY, BYTE axis)
 {
 	o->NumTails++;
-	if(o->NumTails > o->MaxTails-1) 
+	if (o->NumTails >= o->MaxTails)
 	{
-		o->NumTails = o->MaxTails-1;
+		o->NumTails = o->MaxTails - 1;
 	}
-	
-	for(int j=o->NumTails-1;j>=0;j--)
+	for (int j = o->NumTails - 1; j >= 0; j--)
 	{
-		for(int k=0;k<4;k++)
-			VectorCopy(o->Tails[j][k],o->Tails[j+1][k]);
+		for (int k = 0; k < 4; k++)
+			VectorCopy(o->Tails[j][k], o->Tails[j + 1][k]);
 	}
-	
-	vec3_t Position,p;
-	if(axis == 0)
+
+	vec3_t Position, p;
+	if (axis == 0)
 	{
-		Vector(-o->Scale*0.5f,0.f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][0]);
-		Vector(o->Scale*0.5f,0.f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][1]);
-		Vector(0.f,0.f,-o->Scale*0.5f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][2]);
-		Vector(0.f,0.f,o->Scale*0.5f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][3]);
+		Vector(-ScaleX * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][0]);
+		Vector(-ScaleX * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][1]);
+		Vector(-ScaleX * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][2]);
+		Vector(-ScaleX * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][3]);
 	}
 	else
 	{
-		Vector(-o->Scale*0.5f,0.f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][0]);
-		Vector(o->Scale*0.5f,0.f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][1]);
-		Vector(0.f,-o->Scale*0.5f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][2]);
-		Vector(0.f,o->Scale*0.5f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][3]);
+		Vector(-ScaleX * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][0]);
+		Vector(-ScaleX * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][1]);
+		Vector(-ScaleX * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][2]);
+		Vector(-ScaleX * 0.5f, 0.f, 0.f, Position);
+		VectorRotate(Position, Matrix, p);
+		VectorAdd(o->Position, p, o->Tails[0][3]);
 	}
 }
-
-void CreateTailAxis(JOINT *o, float Matrix[3][4], float ScaleX, float ScaleY, BYTE axis)
-{
-	o->NumTails++;
-	if(o->NumTails > o->MaxTails-1) 
-	{
-		o->NumTails = o->MaxTails-1;
-	}
-	
-	for(int j=o->NumTails-1;j>=0;j--)
-	{
-		for(int k=0;k<4;k++)
-			VectorCopy(o->Tails[j][k],o->Tails[j+1][k]);
-	}
-	
-	vec3_t Position,p;
-	if(axis == 0)
-	{
-		Vector(-ScaleX*0.5f,0.f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][0]);
-		Vector(ScaleX*0.5f,0.f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][1]);
-		Vector(0.f,0.f,-ScaleY*0.5f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][2]);
-		Vector(0.f,0.f,ScaleY*0.5f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][3]);
-	}
-	else
-	{
-		Vector(-ScaleX*0.5f,0.f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][0]);
-		Vector(ScaleX*0.5f,0.f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][1]);
-		Vector(0.f,-ScaleY*0.5f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][2]);
-		Vector(0.f,ScaleY*0.5f,0.f,Position);
-		VectorRotate(Position,Matrix,p);
-		VectorAdd(o->Position,p,o->Tails[0][3]);
-	}
-}
-
-
 
 void CreateTail(JOINT *o,float Matrix[3][4],bool Blur)
 {
@@ -2965,23 +2943,7 @@ void CreateTail(JOINT *o,float Matrix[3][4], float ScaleX, float ScaleY )
 	VectorAdd(o->Position,p,o->Tails[0][3]);
 }
 
-/*void MoveShpere(vec3_t Position,vec3_t Angle)
-{
-OBJECT *to = &Hero->Object;
-vec3_t Range;
-VectorSubtract(Position,to->Position,Range);
-float Distance = Range[0]*Range[0]+Range[1]*Range[1];
-float CollisionRange = 100.f*100.f;
-if(Distance <= CollisionRange)
-{
-float Rotation = 360.f-CreateAngle(Position[0],Position[1],to->Position[0],to->Position[1]);
-Angle[2] = TurnAngle2(Angle[2],Rotation,FarAngle(Angle[2],Rotation)*0.2f);
-}
-else Angle[2] = TurnAngle2(Angle[2],0.f,FarAngle(Angle[2],0.f)*0.5f);
-}*/
-
 LONG FAR PASCAL WndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
-
 
 void MoveJoint( JOINT *o, int iIndex)
 {
@@ -7021,14 +6983,19 @@ void MoveJoint( JOINT *o, int iIndex)
 	}
 }
 
+
 void MoveJoints()
 {
-	for(int i=0;i<MAX_JOINTS;i++)
+	for (int i = 0; i < MAX_JOINTS; i++)
 	{
-		JOINT *o = &Joints[i];
-		if(o->Live)
+		JOINT* o = &Joints[i];
+		if (o->Live)
 		{
-			MoveJoint( o, i);
+			MoveJoint(o, i);
+		}
+		else
+		{
+			// Adicionar aqui uma lógica de fallback ou tratamento de erro caso o objeto não esteja ativo
 		}
 	}
 }
@@ -7406,21 +7373,25 @@ void RenderJoints( BYTE bRenderOneMore )
 	}
 }
 
-void GetMagicScrew( int iParam, vec3_t vResult, float fSpeedRate)
+void GetMagicScrew(int iParam, vec3_t vResult, float fSpeedRate)
 {
 	iParam += MoveSceneFrame;
-	
 	vec3_t vDirTemp;
-	float fSpeed[3] = { 0.048f, 0.0613f, 0.1113f};
+	float fSpeed[3] = { 0.048f, 0.0613f, 0.1113f };
 	fSpeed[0] *= fSpeedRate;
 	fSpeed[1] *= fSpeedRate;
 	fSpeed[2] *= fSpeedRate;
-	vDirTemp[0] = sinf( ( float)( iParam+55555)*fSpeed[0]) * cosf( ( float)iParam*fSpeed[1]);
-	vDirTemp[1] = sinf( ( float)( iParam+55555)*fSpeed[0]) * sinf( ( float)iParam*fSpeed[1]);
-	vDirTemp[2] = cosf( ( float)( iParam+55555)*fSpeed[0]);
-	float fSinAdd = sinf( ( float)( iParam+11111)*fSpeed[2]);
-	float fCosAdd = cosf( ( float)( iParam+11111)*fSpeed[2]);
+	float sin_x = sinf((float)(iParam + 55555) * fSpeed[0]);
+	float cos_y = cosf((float)iParam * fSpeed[1]);
+	float sin_y = sinf((float)iParam * fSpeed[1]);
+	float cos_z = cosf((float)(iParam + 11111) * fSpeed[2]);
+	float sin_z = sinf((float)(iParam + 11111) * fSpeed[2]);
+
+	vDirTemp[0] = sin_x * cos_y;
+	vDirTemp[1] = sin_x * sin_y;
+	vDirTemp[2] = cosf((float)(iParam + 55555) * fSpeed[0]);
+
 	vResult[2] = vDirTemp[0];
-	vResult[1] = fSinAdd * vDirTemp[1] + fCosAdd * vDirTemp[2];
-	vResult[0] = fCosAdd * vDirTemp[1] - fSinAdd * vDirTemp[2];
+	vResult[1] = sin_z * vDirTemp[1] + cos_z * vDirTemp[2];
+	vResult[0] = cos_z * vDirTemp[1] - sin_z * vDirTemp[2];
 }

@@ -1,5 +1,10 @@
+#ifndef _WIN64
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
 
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+#ifdef _WIN64
+#include <immintrin.h> // Incluir o cabeçalho para usar as instruções intrínsecas
+#endif
 
 #include "stdafx.h"
 
@@ -472,6 +477,7 @@ void CCyclicRedundancyCheck32::DestroyCrc32Table()
 	delete [] m_pdwCrc32Table; 
 }
 
+#ifndef _WIN64
 void CCyclicRedundancyCheck32::GenerateCrc32SeedAssembly(BYTE* pbyBuffer, size_t size, DWORD& dwCrc32) 
 {
 	DWORD dwByteRead = size;
@@ -515,3 +521,23 @@ crc32loop:
 		mov [eax], ecx				// Write the result
 	}
 }
+#else 
+void CCyclicRedundancyCheck32::GenerateCrc32SeedAssembly(BYTE* pbyBuffer, size_t size, DWORD& dwCrc32)
+{
+	DWORD dwByteRead = static_cast<DWORD>(size);
+	DWORD crc32 = dwCrc32;
+
+	for (DWORD i = 0; i < dwByteRead; i++)
+	{
+		BYTE currentByte = pbyBuffer[i];
+		crc32 ^= currentByte;
+
+		for (int j = 0; j < 8; j++)
+		{
+			crc32 = (crc32 >> 1) ^ (0xEDB88320 & -(crc32 & 1));
+		}
+	}
+
+	dwCrc32 = crc32;
+}
+#endif
