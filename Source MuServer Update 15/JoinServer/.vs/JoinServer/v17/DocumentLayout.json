@@ -1,0 +1,122 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\JoinServer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|solutionrelative:JoinServer\\JoinServer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\Protect.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|solutionrelative:JoinServer\\Protect.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\stdafx.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|solutionrelative:JoinServer\\stdafx.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\Util.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|solutionrelative:JoinServer\\Util.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\MemScript.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|solutionrelative:JoinServer\\MemScript.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\AllowableIpList.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1BEFA73B-17C6-4E97-A35F-A4CBFA7678A1}|JoinServer\\JoinServer.vcxproj|solutionrelative:JoinServer\\AllowableIpList.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "JoinServer.h",
+              "DocumentMoniker": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\JoinServer.h",
+              "RelativeDocumentMoniker": "JoinServer\\JoinServer.h",
+              "ToolTip": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\JoinServer.h",
+              "RelativeToolTip": "JoinServer\\JoinServer.h",
+              "ViewState": "AQIAAAgAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-03-11T00:04:51.557Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "stdafx.cpp",
+              "DocumentMoniker": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\stdafx.cpp",
+              "RelativeDocumentMoniker": "JoinServer\\stdafx.cpp",
+              "ToolTip": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\stdafx.cpp",
+              "RelativeToolTip": "JoinServer\\stdafx.cpp",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-03-11T00:04:32.374Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Util.cpp",
+              "DocumentMoniker": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\Util.cpp",
+              "RelativeDocumentMoniker": "JoinServer\\Util.cpp",
+              "ToolTip": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\Util.cpp",
+              "RelativeToolTip": "JoinServer\\Util.cpp",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-03-11T00:04:31.009Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Protect.cpp",
+              "DocumentMoniker": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\Protect.cpp",
+              "RelativeDocumentMoniker": "JoinServer\\Protect.cpp",
+              "ToolTip": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\Protect.cpp",
+              "RelativeToolTip": "JoinServer\\Protect.cpp",
+              "ViewState": "AQIAAB0BAAAAAAAAAAAAAJkAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-03-11T00:04:27.499Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MemScript.cpp",
+              "DocumentMoniker": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\MemScript.cpp",
+              "RelativeDocumentMoniker": "JoinServer\\MemScript.cpp",
+              "ToolTip": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\MemScript.cpp",
+              "RelativeToolTip": "JoinServer\\MemScript.cpp",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-03-11T00:04:26.536Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AllowableIpList.cpp",
+              "DocumentMoniker": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\AllowableIpList.cpp",
+              "RelativeDocumentMoniker": "JoinServer\\AllowableIpList.cpp",
+              "ToolTip": "D:\\MuOnline\\Client Main Season 5.2\\Source MuServer Update 15\\JoinServer\\JoinServer\\AllowableIpList.cpp",
+              "RelativeToolTip": "JoinServer\\AllowableIpList.cpp",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-03-11T00:04:25.224Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
