@@ -22,6 +22,7 @@
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
+    <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Global Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -74,7 +75,6 @@
       <HeaderFileName />
     </Midl>
     <ClCompile>
-      <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)source\;$(SolutionDir)dependencies\include;$(SolutionDir)dependencies\include\asio</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_FOREIGN_DEBUG;_LANGUAGE_FOREIGN;_LANGUAGE_ENG;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
@@ -97,6 +97,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>Custom</Optimization>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -139,7 +141,7 @@
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)source\;$(SolutionDir)dependencies\include;$(SolutionDir)dependencies\include\asio</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\Boost;$(SolutionDir)source\;$(SolutionDir)dependencies\include;$(SolutionDir)dependencies\include\asio</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_FOREIGN_NDEBUG;_LANGUAGE_FOREIGN;_LANGUAGE_ENG;LDS_PATCH_GLOBAL_100520;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>
@@ -400,6 +402,7 @@
     <ClCompile Include="source\NewUIMiniMap.cpp" />
     <ClCompile Include="source\NewUIMixInventory.cpp" />
     <ClCompile Include="source\NewUIMoveCommandWindow.cpp" />
+    <ClCompile Include="source\NewUIMuHelper.cpp" />
     <ClCompile Include="source\NewUIMyInventory.cpp" />
     <ClCompile Include="source\NewUIMyQuestInfoWindow.cpp" />
     <ClCompile Include="source\NewUIMyShopInventory.cpp" />
@@ -601,9 +604,12 @@
     <ClInclude Include="source\ExplanationInfo.h" />
     <ClInclude Include="source\ExternalObject\Leaf\callstackdmp.h" />
     <ClInclude Include="source\ExternalObject\Leaf\checkintegrity.h" />
+    <ClInclude Include="source\ExternalObject\Leaf\constants.h" />
     <ClInclude Include="source\ExternalObject\Leaf\ExceptionHandler.h" />
     <ClInclude Include="source\ExternalObject\Leaf\html_log.h" />
+    <ClInclude Include="source\ExternalObject\Leaf\intrinsics.h" />
     <ClInclude Include="source\ExternalObject\Leaf\peimage.h" />
+    <ClInclude Include="source\ExternalObject\Leaf\platform.h" />
     <ClInclude Include="source\ExternalObject\Leaf\rdtsc.h" />
     <ClInclude Include="source\ExternalObject\Leaf\regkey.h" />
     <ClInclude Include="source\ExternalObject\Leaf\stdleaf.h" />
@@ -776,6 +782,7 @@
     <ClInclude Include="source\NewUIMiniMap.h" />
     <ClInclude Include="source\NewUIMixInventory.h" />
     <ClInclude Include="source\NewUIMoveCommandWindow.h" />
+    <ClInclude Include="source\NewUIMuHelper.h" />
     <ClInclude Include="source\NewUIMyInventory.h" />
     <ClInclude Include="source\NewUIMyQuestInfoWindow.h" />
     <ClInclude Include="source\NewUIMyShopInventory.h" />
@@ -810,6 +817,8 @@
     <ClInclude Include="source\npcBreeder.h" />
     <ClInclude Include="source\npcCatapult.h" />
     <ClInclude Include="source\npcGateSwitch.h" />
+    <ClInclude Include="Source\nvapi.h" />
+    <ClInclude Include="Source\NvApiDriverSettings.h" />
     <ClInclude Include="source\Observer.h" />
     <ClInclude Include="source\OptionWin.h" />
     <ClInclude Include="source\PartyManager.h" />

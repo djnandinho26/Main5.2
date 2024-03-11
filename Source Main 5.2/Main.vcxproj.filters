@@ -190,6 +190,9 @@
     <Filter Include="External Object\Leaf">
       <UniqueIdentifier>{3b92a23e-4343-428e-9736-2f625e9e74b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MU\Client\Nvidia">
+      <UniqueIdentifier>{c7966dec-039d-4e87-bb36-90fb440eb453}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="source\icon1.ico">
@@ -1176,6 +1179,9 @@
     </ClCompile>
     <ClCompile Include="source\ExternalObject\Leaf\xstreambuf.cpp">
       <Filter>External Object\Leaf</Filter>
+    </ClCompile>
+    <ClCompile Include="source\NewUIMuHelper.cpp">
+      <Filter>MU\Interface\NewUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2246,6 +2252,24 @@
     </ClInclude>
     <ClInclude Include="source\ExternalObject\Leaf\xstreambuf.h">
       <Filter>External Object\Leaf</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\nvapi.h">
+      <Filter>MU\Client\Nvidia</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\NvApiDriverSettings.h">
+      <Filter>MU\Client\Nvidia</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ExternalObject\Leaf\platform.h">
+      <Filter>External Object\Leaf</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ExternalObject\Leaf\constants.h">
+      <Filter>External Object\Leaf</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ExternalObject\Leaf\intrinsics.h">
+      <Filter>External Object\Leaf</Filter>
+    </ClInclude>
+    <ClInclude Include="source\NewUIMuHelper.h">
+      <Filter>MU\Interface\NewUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
